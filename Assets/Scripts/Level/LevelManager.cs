@@ -14,5 +14,9 @@ namespace Derevo.Level
         {
             return null;
         }
+        public static LevelCell GetCell(int column,int row)
+        {
+            return null;
+        }
     }
 }

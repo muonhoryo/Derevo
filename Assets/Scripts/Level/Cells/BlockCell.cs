@@ -4,5 +4,5 @@ using System;
 
 namespace Derevo.Level 
 {
-    public sealed class BlockCell { }
+    public sealed class BlockCell:LevelCell { }
 }

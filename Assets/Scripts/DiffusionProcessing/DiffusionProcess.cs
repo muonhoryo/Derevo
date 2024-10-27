@@ -1,20 +1,30 @@
 
 using System;
+using System.Collections.Generic;
 using Derevo.Level;
 
 namespace Derevo.DiffusionProcessing 
 {
     public sealed class DiffusionProcess
     {
+        public event Action<DiffusionProcess> BecameAggregateTargetEvent = delegate { };
+
         private DiffusionProcess() { }
-        public DiffusionProcess(ValuableCell owner, params ValuableCell[] members)
+        public DiffusionProcess(DiffusionCell owner, params DiffusionCell[] members)
         {
-            throw new Exception("MRE");
+            Members = new List<DiffusionCell>(1 + members.Length);
+            Members.Add(owner);
+            foreach(var member in members) 
+            {
+                Members.Add(member);
+            }
         }
 
-        public void AdddMember(ValuableCell member)
+        private List<DiffusionCell> Members;
+
+        public void AddMember(DiffusionCell member)
         {
-            throw new Exception("MRE");
+            Members.Add(member);
         }
         public void Diffuse()
         {
@@ -22,7 +32,13 @@ namespace Derevo.DiffusionProcessing
         }
         public void Aggregate(DiffusionProcess otherProcess)
         {
-            throw new Exception("MRE");
+            Members.AddRange(otherProcess.Members);
+            otherProcess.BecameAggregateTarget(this);
+        }
+
+        private void BecameAggregateTarget(DiffusionProcess aggregateOwner)
+        {
+            BecameAggregateTargetEvent(aggregateOwner);
         }
     }
 }

@@ -42,6 +42,11 @@ namespace Derevo.DiffusionProcessing
             StartDiffusionEvent();
             CoroutinesHandler.Instance_.StartCoroutine(EndDiffusionDelay());
         }
+        //DiffusionMap
+        public static DiffusionCell GetDiffusionCell(int cellColumn,int cellRow)
+        {
+            throw new Exception("MRE");
+        }
 
         private static IEnumerator EndDiffusionDelay()
         {
