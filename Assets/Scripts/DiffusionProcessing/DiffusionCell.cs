@@ -2,24 +2,25 @@
 
 using System.Linq;
 using Derevo.Level;
+using UnityEngine;
 
 namespace Derevo.DiffusionProcessing 
 {
     public sealed class DiffusionCell
     {
         private DiffusionCell() { }
-        public DiffusionCell(LevelCell Cell)
+        public DiffusionCell(LevelCell Cell,Vector2Int CellPosition)
         {
             this.Cell = Cell;
+            this.CellPosition= CellPosition;
         }
 
         private readonly LevelCell Cell;
+        private readonly Vector2Int CellPosition;
         private DiffusionProcess CurrentDiffProc = null;
 
-        public LevelCell Cell_
-        {
-            get => Cell;
-        }
+        public LevelCell Cell_ => Cell;
+        public Vector2Int CellPosition_ => CellPosition;
 
         public DiffusionProcess GetDiffusionProcess(int cellColumn,int cellRow)
         {
@@ -64,7 +65,8 @@ namespace Derevo.DiffusionProcessing
         }
         private void AggregateProcessAction(DiffusionProcess newOwner)
         {
-            CurrentDiffProc.BecameAggregateTargetEvent -= AggregateProcessAction;
+            if(CurrentDiffProc!=null)
+                CurrentDiffProc.BecameAggregateTargetEvent -= AggregateProcessAction;
             CurrentDiffProc = newOwner;
             CurrentDiffProc.BecameAggregateTargetEvent += AggregateProcessAction;
         }

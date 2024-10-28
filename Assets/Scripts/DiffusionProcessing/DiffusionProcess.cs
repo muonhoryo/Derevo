@@ -28,7 +28,37 @@ namespace Derevo.DiffusionProcessing
         }
         public void Diffuse()
         {
-            throw new Exception("MRE");
+            int sum = 0;
+            int onlyValue;
+
+            foreach(var member in Members)
+            {
+                sum += (member.Cell_ as ValuableCell).Value_;
+            }
+            int rem = sum % Members.Count;
+            if (rem!=0)
+            {
+                sum -= rem;
+                onlyValue = sum / Members.Count;
+                int i = 0;
+                for (; rem > 0; i++)
+                {
+                    LevelManager.SetCellValue(onlyValue + 1, Members[i].CellPosition_.x, Members[i].CellPosition_.y);
+                    rem--;
+                }
+                for (; i < Members.Count; i++)
+                {
+                    LevelManager.SetCellValue(onlyValue, Members[i].CellPosition_.x, Members[i].CellPosition_.y);
+                }
+            }
+            else
+            {
+                onlyValue = rem;
+                foreach (var member in Members)
+                {
+                    LevelManager.SetCellValue(onlyValue, member.CellPosition_.x, member.CellPosition_.y);
+                }
+            }
         }
         public void Aggregate(DiffusionProcess otherProcess)
         {

@@ -35,5 +35,23 @@ namespace Derevo.Level
                 return mainConn;
             }
         }
+        public override bool HasConnection(Vector2Int cellPos)
+        {
+            if (base.HasConnection(cellPos))
+                return true;
+            else
+            {
+                return HasConnectionByDirection(ExtendDirection, cellPos);
+            }
+        }
+
+        public override void Clone(LevelCell source)
+        {
+            base.Clone(source);
+            if(source is ExtenderCell parsSource)
+            {
+                ExtendDirection=parsSource.ExtendDirection_;
+            }
+        }
     }
 }

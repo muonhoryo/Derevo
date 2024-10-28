@@ -4,7 +4,7 @@
 using Derevo.DiffusionProcessing;
 using UnityEngine;
 
-public class DiffusionProcessingText : MonoBehaviour
+public class DiffusionProcessingTest_MainClassStruct : MonoBehaviour
 {
     float StartTime;
 

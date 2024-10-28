@@ -10,11 +10,11 @@ namespace Derevo.DiffusionProcessing
     {
         public struct DiffusionProcessInfo
         {
-            public int?[] PreDiffMap;
+            public int?[][] PreDiffMap;
             public DiffusionProcess[] HandledProcceses;
-            public int?[] PostDiffMap;
+            public int?[][] PostDiffMap;
 
-            public DiffusionProcessInfo(int?[] preDiffMap, DiffusionProcess[] handledProcceses, int?[] postDiffMap)
+            public DiffusionProcessInfo(int?[][] preDiffMap, DiffusionProcess[] handledProcceses, int?[][] postDiffMap)
             {
                 PreDiffMap = preDiffMap;
                 HandledProcceses = handledProcceses;
