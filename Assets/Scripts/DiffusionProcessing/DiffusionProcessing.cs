@@ -8,18 +8,12 @@ namespace Derevo.DiffusionProcessing
 {
     public static class DiffusionProcessing
     {
-        public struct DiffusionProcessInfo
+        public sealed class DiffusionProcessInfo
         {
             public int?[][] PreDiffMap;
             public DiffusionProcess[] HandledProcceses;
+            public DiffusionCell[][] DiffusionMap;
             public int?[][] PostDiffMap;
-
-            public DiffusionProcessInfo(int?[][] preDiffMap, DiffusionProcess[] handledProcceses, int?[][] postDiffMap)
-            {
-                PreDiffMap = preDiffMap;
-                HandledProcceses = handledProcceses;
-                PostDiffMap = postDiffMap;
-            }
         }
 
         public static event Action StartDiffusionEvent=delegate { };
@@ -32,12 +26,15 @@ namespace Derevo.DiffusionProcessing
         {
             if (IsInProcess_)
                 return;
-            var preDiffMap = LevelManager.GetValueMap();
-            var procs = LevelManager.InitializeDiffusionProcesses();
-            foreach (var proc in procs)
+
+            LastStartedProcessInfo_=new DiffusionProcessInfo();
+            LastStartedProcessInfo_.PreDiffMap= LevelManager.GetValueMap();
+            LastStartedProcessInfo_.DiffusionMap = LevelManager.GetDiffusionMap();
+            LastStartedProcessInfo_.HandledProcceses = LevelManager.InitializeDiffusionProcesses();
+            foreach (var proc in LastStartedProcessInfo_.HandledProcceses)
                 proc.Diffuse();
-            var postDiffMap= LevelManager.GetValueMap();
-            LastStartedProcessInfo_ = new DiffusionProcessInfo(preDiffMap, procs, postDiffMap);
+            LevelManager.ResetValuableCellsDirections();
+            LastStartedProcessInfo_.PostDiffMap = LevelManager.GetValueMap();
             IsInProcess_ = true;
             StartDiffusionEvent();
             CoroutinesHandler.Instance_.StartCoroutine(EndDiffusionDelay());
@@ -45,7 +42,7 @@ namespace Derevo.DiffusionProcessing
         //DiffusionMap
         public static DiffusionCell GetDiffusionCell(int cellColumn,int cellRow)
         {
-            throw new Exception("MRE");
+            return LastStartedProcessInfo_.DiffusionMap[cellColumn][ cellRow];
         }
 
         private static IEnumerator EndDiffusionDelay()

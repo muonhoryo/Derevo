@@ -1,7 +1,6 @@
 
 using Derevo.DiffusionProcessing;
 using UnityEngine;
-using Derevo.Level;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,16 +29,16 @@ namespace Derevo.Level
         public struct ChangeCellDiffDIrectionEventInfo
         {
             public ValuableCell ChangedCell;
-            public ValuableCell.DiffusionDirection OldValue;
-            public ValuableCell.DiffusionDirection NewValue;
+            public ValuableCell.DiffusionDirection OldDirection;
+            public ValuableCell.DiffusionDirection NewDirection;
             public int Column;
             public int Row;
 
-            public ChangeCellDiffDIrectionEventInfo(ValuableCell changedCell, ValuableCell.DiffusionDirection oldValue, ValuableCell.DiffusionDirection newValue, int column, int row)
+            public ChangeCellDiffDIrectionEventInfo(ValuableCell changedCell, ValuableCell.DiffusionDirection oldDirection, ValuableCell.DiffusionDirection newDirection, int column, int row)
             {
                 ChangedCell = changedCell;
-                OldValue = oldValue;
-                NewValue = newValue;
+                OldDirection = oldDirection;
+                NewDirection = newDirection;
                 Column = column;
                 Row = row;
             }
@@ -63,52 +62,30 @@ namespace Derevo.Level
         public static event Action<ChangeCellValueEventInfo> ChangeCellValueEvent = delegate { };
         public static event Action<ChangeCellDiffDIrectionEventInfo> ChangeCellDiffDirectionEvent = delegate { };
         public static event Action<ChangeCellTypeValueEventInfo> ChangeCellTypeEvent = delegate { };
+        public static event Action InitializeMapEvent = delegate { };
 
         private static LevelCell[][] LevelMap;
         private static Vector2Int LevelMapSize;
 
         public static Vector2Int LevelMapSize_ => LevelMapSize;
 
+        public static DiffusionCell[][] GetDiffusionMap()
+        {
+            DiffusionCell[][] diffusionMap = new DiffusionCell[LevelMapSize.x][];
+
+            for (int i = 0; i < LevelMapSize.x; i++)
+            {
+                diffusionMap[i] = new DiffusionCell[LevelMapSize.y];
+                for (int j = 0; j < LevelMapSize.y; j++)
+                {
+                    diffusionMap[i][j] = new DiffusionCell(LevelMap[i][j], new Vector2Int(i, j));
+                }
+            }
+            return diffusionMap;
+        }
         public static DiffusionProcess[] InitializeDiffusionProcesses()
         {
             var procs = new List<DiffusionProcess>();
-            DiffusionCell[][] diffusionMap = new DiffusionCell[LevelMapSize.x][];
-
-            void CreateDiffusionMap()
-            {
-                for (int i = 0; i < LevelMapSize.x; i++)
-                {
-                    for(int j=0; j < LevelMapSize.y; j++)
-                    {
-                        diffusionMap[i][j] = new DiffusionCell(LevelMap[i][j], new Vector2Int(i, j));
-                    }
-                }
-            }
-            void FillDiffProcessesList()
-            {
-                ValuableCell parCell;
-                Vector2Int pos;
-                for (int i = 0; i < LevelMapSize.x; i++)
-                {
-                    for (int j = 0; j < LevelMapSize.y; j++)
-                    {
-                        parCell = diffusionMap[i][j].Cell_ as ValuableCell;
-                        if (parCell != null)
-                        {
-                            pos = new Vector2Int(i, j);
-                            if (parCell.HasConnection(pos))
-                            {
-                                var process = diffusionMap[i][j].GetDiffusionProcess(i, j);
-                                if (process != null)
-                                {
-                                    SubscribeOnAggEvent(process);
-                                    procs.Add(process);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
             void SubscribeOnAggEvent(DiffusionProcess owner)
             {
                 void BecameAggTargetAction(DiffusionProcess newProc)
@@ -120,8 +97,28 @@ namespace Derevo.Level
                 owner.BecameAggregateTargetEvent += BecameAggTargetAction;
             }
 
-            CreateDiffusionMap();
-            FillDiffProcessesList();
+            ValuableCell parCell;
+            Vector2Int pos;
+            for (int i = 0; i < LevelMapSize.x; i++)
+            {
+                for (int j = 0; j < LevelMapSize.y; j++)
+                {
+                    parCell = DiffusionProcessing.DiffusionProcessing.LastStartedProcessInfo_.DiffusionMap[i][j].Cell_ as ValuableCell;
+                    if (parCell != null)
+                    {
+                        pos = new Vector2Int(i, j);
+                        if (parCell.HasConnection(pos))
+                        {
+                            var process = DiffusionProcessing.DiffusionProcessing.LastStartedProcessInfo_.DiffusionMap[i][j].GetDiffusionProcess(i, j);
+                            if (process != null)
+                            {
+                                SubscribeOnAggEvent(process);
+                                procs.Add(process);
+                            }
+                        }
+                    }
+                }
+            }
             return procs.ToArray();
         }
         public static int?[][] GetValueMap()
@@ -169,6 +166,20 @@ namespace Derevo.Level
                 InternalSetDiffusionDirection(parsCell, direction, column, row);
             }
         }
+        public static void ResetValuableCellsDirections()
+        {
+            for(int i = 0; i < LevelMapSize.x; i++)
+            {
+                for(int j = 0; j < LevelMapSize.y; j++)
+                {
+                    var parsCell = LevelMap[i][j] as ValuableCell;
+                    if (parsCell != null)
+                    {
+                        InternalSetDiffusionDirection(parsCell,0, i, j);
+                    }
+                }
+            }
+        }
         public static void SetCellType(LevelCell newCell,int column,int row)
         {
             if (!CheckCellPos(column, row))
@@ -185,13 +196,24 @@ namespace Derevo.Level
         }
         public static void InitializeLevel(LevelMapInfo info)
         {
-            throw new Exception("MRE");
+            if (!ValidateLevelMapInfo(info))
+                throw new Exception("Invalid LevelMapInfo.");
+
+            LevelMapSize = new Vector2Int(info.Width, info.Height);
+            LevelMap = new LevelCell[LevelMapSize.x][];
+            Func<LevelCellInfo, LevelCell> selectFunc = (cellInfo) =>
+                cellInfo.InitializeCell();
+            for(int i = 0; i < LevelMapSize.x; i++)
+            {
+                LevelMap[i] = info.CellsInfo[i].Select(selectFunc).ToArray();
+            }
+            InitializeMapEvent();
         }
 
         public static bool CheckCellPos(int column,int row)
         {
-            return column > 0 && column < LevelMapSize.x &&
-                row > 0 && row < LevelMapSize.y;
+            return column >= 0 && column < LevelMapSize.x &&
+                row >= 0 && row < LevelMapSize.y;
         }
 
         private static void InternalSetCellValue(ValuableCell target, int value, int column, int row)
@@ -213,6 +235,22 @@ namespace Derevo.Level
 
             var info = new ChangeCellDiffDIrectionEventInfo(target, oldValue, direction, column, row);
             ChangeCellDiffDirectionEvent(info);
+        }
+        private static bool ValidateLevelMapInfo(LevelMapInfo info)
+        {
+            if (info.CellsInfo==null|| info.CellsInfo.Length != info.Width)
+                return false;
+            foreach (var column in info.CellsInfo)
+            {
+                if (column==null||column.Length != info.Height)
+                    return false;
+                foreach(var cell in column)
+                {
+                    if (cell == null)
+                        return false;
+                }
+            }
+            return true;
         }
     }
 }
