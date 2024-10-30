@@ -229,9 +229,10 @@ namespace Derevo.Level
         private static void InternalSetDiffusionDirection(ValuableCell target, ValuableCell.DiffusionDirection direction, int column, int row)
         {
             ValuableCell.DiffusionDirection oldValue = target.DiffusionDirection_;
-            target.SetDiffusionDirection(direction, column, row);
-            if (oldValue != target.DiffusionDirection_)
+            if(!target.TrySetDiffusionDirection(direction, column, row))
+            {
                 return;
+            }
 
             var info = new ChangeCellDiffDIrectionEventInfo(target, oldValue, direction, column, row);
             ChangeCellDiffDirectionEvent(info);

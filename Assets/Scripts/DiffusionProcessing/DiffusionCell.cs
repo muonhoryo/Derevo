@@ -52,6 +52,7 @@ namespace Derevo.DiffusionProcessing
                     diffProc != null)
                 {
                     CurrentDiffProc= diffProc;
+                    CurrentDiffProc.AddMember(this);
                 }
                 else if (CurrentDiffProc != diffProc)
                 {

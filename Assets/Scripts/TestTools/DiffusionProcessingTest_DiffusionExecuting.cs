@@ -23,15 +23,15 @@ public class DiffusionProcessingTest_DiffusionExecuting:MonoBehaviour
             new LevelManager.LevelCellInfo[height]
             {
                 new LevelManager.ValuableCellInfo(0),
-                new LevelManager.ExtenderCellInfo(9,ValuableCell.DiffusionDirection.Bottom),
                 new LevelManager.ExtenderCellInfo(0,ValuableCell.DiffusionDirection.Right),
+                new LevelManager.ExtenderCellInfo(9,ValuableCell.DiffusionDirection.Bottom),
                 new LevelManager.ValuableCellInfo(0)
             },
             new LevelManager.LevelCellInfo[height]
             {
                 new LevelManager.ValuableCellInfo(0),
-                new LevelManager.ValuableCellInfo(0),
                 new LevelManager.ExtenderCellInfo(0,ValuableCell.DiffusionDirection.Top),
+                new LevelManager.ValuableCellInfo(0),
                 new LevelManager.ValuableCellInfo(0)
             },
             new LevelManager.LevelCellInfo[height]
@@ -61,6 +61,8 @@ public class DiffusionProcessingTest_DiffusionExecuting:MonoBehaviour
         DiffusionProcessing.StartDiffusionEvent += PrintDiffusionInfo;
 
         LevelManager.InitializeLevel(Map);
+        LevelManager.SetCellDiffusionDirection(ValuableCell.DiffusionDirection.Top, 2, 0);
+        PrintLevelMap();
         DiffusionProcessing.StartDiffusion();
         PrintLevelMap();
     }
@@ -71,8 +73,7 @@ public class DiffusionProcessingTest_DiffusionExecuting:MonoBehaviour
         StringBuilder valueStr = new StringBuilder();
         StringBuilder dirStr=new StringBuilder();
         ValuableCell cell;
-        ExtenderCell parCell;
-        for(int i = 0; i < LevelManager.LevelMapSize_.y; i++)
+        for(int i = LevelManager.LevelMapSize_.y-1; i >=0 ; i--)
         {
             for(int j = 0; j < LevelManager.LevelMapSize_.x; j++)
             {
@@ -86,34 +87,31 @@ public class DiffusionProcessingTest_DiffusionExecuting:MonoBehaviour
                 else
                     valueStr.Append(cell.Value_.ToString()+"|");
 
-                parCell = cell as ExtenderCell;
-                if (parCell == null)
+                string appStr;
+                ValuableCell.DiffusionDirection direction = cell.DiffusionDirection_;
+                if(cell is ExtenderCell parCell)
                 {
-                    dirStr.Append(" X|");
+                    direction = direction | parCell.ExtendDirection_;
                 }
-                else
+                switch (direction)
                 {
-                    string appStr;
-                    switch (parCell.ExtendDirection_) 
-                    {
-                        case ValuableCell.DiffusionDirection.Right:
-                            appStr = "->|";
-                            break;
-                        case ValuableCell.DiffusionDirection.Top:
-                            appStr = " ^|";
-                            break;
-                        case ValuableCell.DiffusionDirection.Left:
-                            appStr = "<-|";
-                            break;
-                        case ValuableCell.DiffusionDirection.Bottom:
-                            appStr = " v|";
-                            break;
-                        default:
-                            appStr = "ER|";
-                            break;
-                    }
-                    dirStr.Append(appStr);
+                    case ValuableCell.DiffusionDirection.Right:
+                        appStr = "->|";
+                        break;
+                    case ValuableCell.DiffusionDirection.Top:
+                        appStr = " ^|";
+                        break;
+                    case ValuableCell.DiffusionDirection.Left:
+                        appStr = "<-|";
+                        break;
+                    case ValuableCell.DiffusionDirection.Bottom:
+                        appStr = " v|";
+                        break;
+                    default:
+                        appStr = " X|";
+                        break;
                 }
+                dirStr.Append(appStr);
             }
             mainStr.Append(valueStr);
             mainStr.Append("_____");

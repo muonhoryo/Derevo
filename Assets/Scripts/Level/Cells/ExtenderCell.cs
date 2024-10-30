@@ -23,6 +23,12 @@ namespace Derevo.Level
                 ExtendDirection = value;
             }
         }
+
+        public bool TrySetExtendDirection(DiffusionDirection direction,int column,int row)
+        {
+            return TrySetDiffusionDirectionField(ref ExtendDirection, direction, column, row);
+        }
+
         public override Vector2Int[] GetConnectedCellsPoses(Vector2Int cellPos)
         {
             Vector2Int[] mainConn =base.GetConnectedCellsPoses(cellPos);
@@ -32,7 +38,7 @@ namespace Derevo.Level
             }
             else
             {
-                return mainConn;
+                return GetCellsFromDirection(ExtendDirection, cellPos);
             }
         }
         public override bool HasConnection(Vector2Int cellPos)

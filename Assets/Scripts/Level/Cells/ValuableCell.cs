@@ -87,64 +87,68 @@ namespace Derevo.Level
         {
             return HasConnectionByDirection(DiffDirection, cellPos);
         }
-        public void SetDiffusionDirection(DiffusionDirection direction, int column, int row)
+        public bool TrySetDiffusionDirection(DiffusionDirection direction, int column, int row)
         {
-            SetDiffusionDirectionField(ref DiffDirection, direction, column, row);
+            return TrySetDiffusionDirectionField(ref DiffDirection, direction, column, row);
         }
 
         protected Vector2Int[] GetCellsFromDirection(DiffusionDirection direction, Vector2Int cellPos)
         {
-            int subdirectionsCount = 0;
-            for (int i = 0; i < 8; i++)
-            {
-                if (((int)direction & (1 << i)) != 0)
-                    subdirectionsCount++;
-            }
-            if (subdirectionsCount == 0)
+            if(direction==0)
                 return new Vector2Int[0];
-            var cells = new List<Vector2Int>(subdirectionsCount);
 
-            bool TryAddCellPos(int digit)
-            {
-                if(TryGetPositionFromDirectionByDigit(direction,digit,cellPos,out Vector2Int newPos)&&
-                    CheckCellConnection(newPos))
-                {
-                    cells.Add(newPos);
-                    if (cells.Count == cells.Capacity)
-                        return true;
-                }
-                return false;
-            }
+            var cells = new List<Vector2Int>();
 
             for(int i = 0; i < 8; i++)
             {
-                if (TryAddCellPos(i))
-                    return cells.ToArray();
+                if (TryGetPositionFromDirectionByDigit(direction, i, cellPos, out Vector2Int newPos) &&
+                    CheckCellConnection(newPos))
+                {
+                    cells.Add(newPos);
+                }
             }
+
+            Debug.Log(cellPos + "____" + cells[0]);
 
             return cells.ToArray();
         }
         protected bool HasConnectionByDirection(DiffusionDirection direction, Vector2Int cellPos)
         {
-            bool CheckDirection(int digitCount, Vector2Int connectionPos)
-            {
-                return ((int)direction & (1 << digitCount)) != 0 && CheckCellConnection(connectionPos);
-            }
+            if (direction == 0)
+                return false;
 
-            return CheckDirection(0, GetRightPos(cellPos)) ||
-                CheckDirection(1, GetTopRightPos(cellPos)) ||
-                CheckDirection(2, GetTopPos(cellPos)) ||
-                CheckDirection(3, GetTopLeftPos(cellPos)) ||
-                CheckDirection(4, GetLeftPos(cellPos)) ||
-                CheckDirection(5, GetBottomLeftPos(cellPos)) ||
-                CheckDirection(6, GetBottomPos(cellPos)) ||
-                CheckDirection(7, GetBottomRightPos(cellPos));
+            Vector2Int result;
+            for(int i = 0; i < 8; i++)
+            {
+                if (TryGetPositionFromDirectionByDigit(direction, i, cellPos, out result))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
-        protected void SetDiffusionDirectionField(ref DiffusionDirection directionField, DiffusionDirection newDirection, int column, int row)
+        protected bool TrySetDiffusionDirectionField(ref DiffusionDirection directionField, DiffusionDirection newDirection, int column, int row)
         {
             if ((int)newDirection > 255)
-                return;
+                return false;
 
+            Vector2Int cellPos = new Vector2Int(column, row);
+            Vector2Int connPos;
+            int mask =  - 1;
+            for(int i = 0; i < 8; i++)
+            {
+                if(TryGetPositionFromDirectionByDigit(newDirection,i,cellPos,out connPos))
+                {
+                    if (!CheckCellConnection(connPos))
+                        newDirection =(DiffusionDirection)((int)newDirection & (mask << i));
+                }
+            }
+            if (directionField != newDirection)
+            {
+                directionField = newDirection;
+                return true;
+            }
+            return false;
         }
 
         private bool CheckCellConnection(Vector2Int targetPos)

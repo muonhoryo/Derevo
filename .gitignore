@@ -11,3 +11,4 @@ Derevo.sln
 /Assets/Scenes
 /Assets/Scripts/GlobalConsts
 /Temp
+*.meta

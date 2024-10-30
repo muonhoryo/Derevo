@@ -1,6 +1,7 @@
 
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using Derevo.Level;
 
 namespace Derevo.DiffusionProcessing 
@@ -53,7 +54,7 @@ namespace Derevo.DiffusionProcessing
             }
             else
             {
-                onlyValue = rem;
+                onlyValue = sum / Members.Count;
                 foreach (var member in Members)
                 {
                     LevelManager.SetCellValue(onlyValue, member.CellPosition_.x, member.CellPosition_.y);
