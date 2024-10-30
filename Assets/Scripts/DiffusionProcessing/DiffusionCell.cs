@@ -32,7 +32,7 @@ namespace Derevo.DiffusionProcessing
             if (parCell == null)
                 return null;
 
-            var connectedCellsPoses = parCell.GetConnectedCellsPoses(new UnityEngine.Vector2Int(cellColumn,cellRow)).ToArray();
+            var connectedCellsPoses = parCell.GetConnectedCellsPoses(new Vector2Int(cellColumn,cellRow)).ToArray();
 
             if (connectedCellsPoses.Length == 0)
                 return new DiffusionProcess(this);

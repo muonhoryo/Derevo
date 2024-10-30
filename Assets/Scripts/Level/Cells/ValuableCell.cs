@@ -15,37 +15,50 @@ namespace Derevo.Level
             this.Value_ = Value_;
             this.DiffDirection = DiffDirection;
         }
+        public const int MaxDiffusionDirectionDigitsCount = 6;
         public enum DiffusionDirection : ushort
         {
-            Right = 1,
-            TopRight = 2,
-            Top = 4,
-            TopLeft = 8,
-            Left = 16,
-            BottomLeft = 32,
-            Bottom = 64,
-            BottomRight = 128
+            TopRight=1,
+            Top=2,
+            TopLeft=4,
+            BottomLeft=8,
+            Bottom=16,
+            BottomRight=32
         }
         protected Vector2Int GetPositionFromDirectionByDigit(int digit, Vector2Int cellPos)
         {
+            Vector2Int GetRight() =>
+                new Vector2Int(cellPos.x + 1, cellPos.y);
+            Vector2Int GetTopRight() =>
+                new Vector2Int(cellPos.x + 1, cellPos.y + 1);
+            Vector2Int GetTop() =>
+                new Vector2Int(cellPos.x, cellPos.y + 1);
+            Vector2Int GetLeft() =>
+                new Vector2Int(cellPos.x - 1, cellPos.y);
+            Vector2Int GetTopLeft() =>
+                new Vector2Int(cellPos.x - 1, cellPos.y + 1);
+            Vector2Int GetBottomLeft() =>
+                new Vector2Int(cellPos.x - 1, cellPos.y - 1);
+            Vector2Int GetBottom() =>
+                new Vector2Int(cellPos.x, cellPos.y - 1);
+            Vector2Int GetBottomRight() =>
+                new Vector2Int(cellPos.x + 1, cellPos.y - 1);
+
+
             switch (digit)
             {
                 case 0:
-                    return new Vector2Int(cellPos.x + 1, cellPos.y);
+                    return (LevelManager.IsFirstCellBottom_ == (cellPos.x % 2 == 0)) ? GetRight() : GetTopRight();
                 case 1:
-                    return new Vector2Int(cellPos.x + 1, cellPos.y + 1);
+                    return GetTop();
                 case 2:
-                    return new Vector2Int(cellPos.x, cellPos.y + 1);
+                    return (LevelManager.IsFirstCellBottom_ == (cellPos.x % 2 == 0)) ? GetLeft() : GetTopLeft();
                 case 3:
-                    return new Vector2Int(cellPos.x - 1, cellPos.y + 1);
+                    return (LevelManager.IsFirstCellBottom_ != (cellPos.x % 2 == 0)) ? GetLeft() : GetBottomLeft();
                 case 4:
-                    return new Vector2Int(cellPos.x - 1, cellPos.y);
+                    return GetBottom();
                 case 5:
-                    return new Vector2Int(cellPos.x - 1, cellPos.y - 1);
-                case 6:
-                    return new Vector2Int(cellPos.x, cellPos.y - 1);
-                case 7:
-                    return new Vector2Int(cellPos.x + 1, cellPos.y - 1);
+                    return (LevelManager.IsFirstCellBottom_ != (cellPos.x % 2 == 0)) ? GetRight() : GetBottomRight();
                 default:
                     return -Vector2Int.one;
             }
@@ -107,8 +120,6 @@ namespace Derevo.Level
                     cells.Add(newPos);
                 }
             }
-
-            Debug.Log(cellPos + "____" + cells[0]);
 
             return cells.ToArray();
         }

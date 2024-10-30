@@ -23,7 +23,7 @@ public class DiffusionProcessingTest_DiffusionExecuting:MonoBehaviour
             new LevelManager.LevelCellInfo[height]
             {
                 new LevelManager.ValuableCellInfo(0),
-                new LevelManager.ExtenderCellInfo(0,ValuableCell.DiffusionDirection.Right),
+                new LevelManager.ExtenderCellInfo(0,ValuableCell.DiffusionDirection.BottomRight),
                 new LevelManager.ExtenderCellInfo(9,ValuableCell.DiffusionDirection.Bottom),
                 new LevelManager.ValuableCellInfo(0)
             },
@@ -43,8 +43,7 @@ public class DiffusionProcessingTest_DiffusionExecuting:MonoBehaviour
             }
         };
         Map.CellsInfo = mapCells;
-        Map.Width = mapCells.Length;
-        Map.Height= height;
+        Map.IsFirstCellBottom = true;
 
         LevelManager.InitializeMapEvent += () => Debug.Log("initialize new map");
         LevelManager.InitializeMapEvent += PrintLevelMap;
@@ -73,45 +72,113 @@ public class DiffusionProcessingTest_DiffusionExecuting:MonoBehaviour
         StringBuilder valueStr = new StringBuilder();
         StringBuilder dirStr=new StringBuilder();
         ValuableCell cell;
-        for(int i = LevelManager.LevelMapSize_.y-1; i >=0 ; i--)
+        for(int i = LevelManager.MaxHeight_; i >=0 ; i--)
         {
-            for(int j = 0; j < LevelManager.LevelMapSize_.x; j++)
+            for (int w = LevelManager.IsFirstCellBottom_ ? 1 : 0; w < LevelManager.Width_; w += 2)
             {
-                cell = LevelManager.GetCell(j, i) as ValuableCell;
+                if (LevelManager.IsFirstCellBottom_)
+                {
+                    valueStr.Append("___");
+                    dirStr.Append("___");
+                }
+                cell = LevelManager.GetCell(w, i) as ValuableCell;
                 if (cell == null)
                 {
                     valueStr.Append(" X |");
                     dirStr.Append(" X|");
-                    continue;
                 }
                 else
-                    valueStr.Append(cell.Value_.ToString()+"|");
+                    valueStr.Append(cell.Value_.ToString() + "|");
 
                 string appStr;
                 ValuableCell.DiffusionDirection direction = cell.DiffusionDirection_;
-                if(cell is ExtenderCell parCell)
+                if (cell is ExtenderCell parCell)
                 {
                     direction = direction | parCell.ExtendDirection_;
                 }
                 switch (direction)
                 {
-                    case ValuableCell.DiffusionDirection.Right:
-                        appStr = "->|";
+                    case ValuableCell.DiffusionDirection.TopRight:
+                        appStr = "^>|";
                         break;
                     case ValuableCell.DiffusionDirection.Top:
                         appStr = " ^|";
                         break;
-                    case ValuableCell.DiffusionDirection.Left:
-                        appStr = "<-|";
+                    case ValuableCell.DiffusionDirection.TopLeft:
+                        appStr = "<^|";
+                        break;
+                    case ValuableCell.DiffusionDirection.BottomLeft:
+                        appStr = "<v|";
                         break;
                     case ValuableCell.DiffusionDirection.Bottom:
                         appStr = " v|";
+                        break;
+                    case ValuableCell.DiffusionDirection.BottomRight:
+                        appStr = "v>|";
                         break;
                     default:
                         appStr = " X|";
                         break;
                 }
                 dirStr.Append(appStr);
+                if (!LevelManager.IsFirstCellBottom_)
+                {
+                    valueStr.Append("___");
+                    dirStr.Append("___");
+                }
+            }
+            for(int w = LevelManager.IsFirstCellBottom_ ? 0 : 1; w < LevelManager.Width_; w += 2)
+            {
+                if (!LevelManager.IsFirstCellBottom_)
+                {
+                    valueStr.Append("___");
+                    dirStr.Append("___");
+                }
+                cell = LevelManager.GetCell(w, i) as ValuableCell;
+                if (cell == null)
+                {
+                    valueStr.Append(" X |");
+                    dirStr.Append(" X|");
+                }
+                else
+                    valueStr.Append(cell.Value_.ToString() + "|");
+
+                string appStr;
+                ValuableCell.DiffusionDirection direction = cell.DiffusionDirection_;
+                if (cell is ExtenderCell parCell)
+                {
+                    direction = direction | parCell.ExtendDirection_;
+                }
+                switch (direction)
+                {
+                    case ValuableCell.DiffusionDirection.TopRight:
+                        appStr = "^>|";
+                        break;
+                    case ValuableCell.DiffusionDirection.Top:
+                        appStr = " ^|";
+                        break;
+                    case ValuableCell.DiffusionDirection.TopLeft:
+                        appStr = "<^|";
+                        break;
+                    case ValuableCell.DiffusionDirection.BottomLeft:
+                        appStr = "<v|";
+                        break;
+                    case ValuableCell.DiffusionDirection.Bottom:
+                        appStr = " v|";
+                        break;
+                    case ValuableCell.DiffusionDirection.BottomRight:
+                        appStr = "v>|";
+                        break;
+                    default:
+                        appStr = " X|";
+                        break;
+                }
+                dirStr.Append(appStr);
+                if (LevelManager.IsFirstCellBottom_)
+                {
+                    valueStr.Append("___");
+                    dirStr.Append("___");
+                }
             }
             mainStr.Append(valueStr);
             mainStr.Append("_____");

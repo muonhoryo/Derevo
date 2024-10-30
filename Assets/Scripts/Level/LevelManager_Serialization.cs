@@ -9,9 +9,8 @@ namespace Derevo.Level
         [Serializable]
         public struct LevelMapInfo
         {
-            public int Width;
-            public int Height;
-            public LevelCellInfo[][] CellsInfo; 
+            public LevelCellInfo[][] CellsInfo;
+            public bool IsFirstCellBottom;
         }
 
         public abstract class LevelCellInfo 

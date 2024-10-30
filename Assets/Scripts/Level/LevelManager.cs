@@ -65,18 +65,21 @@ namespace Derevo.Level
         public static event Action InitializeMapEvent = delegate { };
 
         private static LevelCell[][] LevelMap;
-        private static Vector2Int LevelMapSize;
+        private static int MaxHeight;
+        private static bool IsFirstCellBottom = true;
 
-        public static Vector2Int LevelMapSize_ => LevelMapSize;
+        public static int Width_ => LevelMap.Length;
+        public static int MaxHeight_ => MaxHeight;
+        public static bool IsFirstCellBottom_ => IsFirstCellBottom;
 
         public static DiffusionCell[][] GetDiffusionMap()
         {
-            DiffusionCell[][] diffusionMap = new DiffusionCell[LevelMapSize.x][];
+            DiffusionCell[][] diffusionMap = new DiffusionCell[Width_][];
 
-            for (int i = 0; i < LevelMapSize.x; i++)
+            for (int i = 0; i < Width_; i++)
             {
-                diffusionMap[i] = new DiffusionCell[LevelMapSize.y];
-                for (int j = 0; j < LevelMapSize.y; j++)
+                diffusionMap[i] = new DiffusionCell[LevelMap[i].Length];
+                for (int j = 0; j < LevelMap[i].Length; j++)
                 {
                     diffusionMap[i][j] = new DiffusionCell(LevelMap[i][j], new Vector2Int(i, j));
                 }
@@ -99,9 +102,9 @@ namespace Derevo.Level
 
             ValuableCell parCell;
             Vector2Int pos;
-            for (int i = 0; i < LevelMapSize.x; i++)
+            for (int i = 0; i < Width_; i++)
             {
-                for (int j = 0; j < LevelMapSize.y; j++)
+                for (int j = 0; j < LevelMap[i].Length; j++)
                 {
                     parCell = DiffusionProcessing.DiffusionProcessing.LastStartedProcessInfo_.DiffusionMap[i][j].Cell_ as ValuableCell;
                     if (parCell != null)
@@ -123,12 +126,12 @@ namespace Derevo.Level
         }
         public static int?[][] GetValueMap()
         {
-            int?[][] valueMap = new int?[LevelMapSize.x][];
+            int?[][] valueMap = new int?[Width_][];
             ValuableCell cell;
-            for (int i = 0; i < LevelMapSize.x; i++)
+            for (int i = 0; i < Width_; i++)
             {
-                valueMap[i] = new int?[LevelMapSize.y];
-                for(int j=0;j<LevelMapSize.y; j++)
+                valueMap[i] = new int?[LevelMap[i].Length];
+                for(int j=0;j<LevelMap[i].Length; j++)
                 {
                     cell = LevelMap[i][j] as ValuableCell;
                     if (cell != null)
@@ -168,9 +171,9 @@ namespace Derevo.Level
         }
         public static void ResetValuableCellsDirections()
         {
-            for(int i = 0; i < LevelMapSize.x; i++)
+            for(int i = 0; i < Width_; i++)
             {
-                for(int j = 0; j < LevelMapSize.y; j++)
+                for(int j = 0; j < LevelMap[i].Length; j++)
                 {
                     var parsCell = LevelMap[i][j] as ValuableCell;
                     if (parsCell != null)
@@ -199,21 +202,23 @@ namespace Derevo.Level
             if (!ValidateLevelMapInfo(info))
                 throw new Exception("Invalid LevelMapInfo.");
 
-            LevelMapSize = new Vector2Int(info.Width, info.Height);
-            LevelMap = new LevelCell[LevelMapSize.x][];
+            IsFirstCellBottom = info.IsFirstCellBottom;
+            LevelMap = new LevelCell[info.CellsInfo.Length][];
             Func<LevelCellInfo, LevelCell> selectFunc = (cellInfo) =>
                 cellInfo.InitializeCell();
-            for(int i = 0; i < LevelMapSize.x; i++)
+            for(int i = 0; i < Width_; i++)
             {
                 LevelMap[i] = info.CellsInfo[i].Select(selectFunc).ToArray();
+                if (LevelMap[i].Length>MaxHeight)
+                    MaxHeight = LevelMap[i].Length;
             }
             InitializeMapEvent();
         }
 
         public static bool CheckCellPos(int column,int row)
         {
-            return column >= 0 && column < LevelMapSize.x &&
-                row >= 0 && row < LevelMapSize.y;
+            return column >= 0 && column < Width_ &&
+                row >= 0 && row < LevelMap[column].Length;
         }
 
         private static void InternalSetCellValue(ValuableCell target, int value, int column, int row)
@@ -239,11 +244,11 @@ namespace Derevo.Level
         }
         private static bool ValidateLevelMapInfo(LevelMapInfo info)
         {
-            if (info.CellsInfo==null|| info.CellsInfo.Length != info.Width)
+            if (info.CellsInfo==null)
                 return false;
             foreach (var column in info.CellsInfo)
             {
-                if (column==null||column.Length != info.Height)
+                if (column==null)
                     return false;
                 foreach(var cell in column)
                 {
