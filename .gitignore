@@ -12,3 +12,4 @@ Derevo.sln
 /Assets/Scripts/GlobalConsts
 /Temp
 *.meta
+/Assets/Scripts/Editor

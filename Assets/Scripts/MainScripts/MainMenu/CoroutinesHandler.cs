@@ -18,6 +18,7 @@ namespace Derevo
 #else
             Instance_=this;
 #endif
+            Debug.Log(GlobalConstsHandler.Instance_.DiffusionProcessTime);
         }
     }
 }
