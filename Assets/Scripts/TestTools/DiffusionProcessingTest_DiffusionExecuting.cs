@@ -43,7 +43,7 @@ public class DiffusionProcessingTest_DiffusionExecuting:MonoBehaviour
             }
         };
         Map.CellsInfo = mapCells;
-        Map.IsFirstCellBottom = true;
+        Map.IsFirstCellBottom = false;
 
         LevelManager.InitializeMapEvent += () => Debug.Log("initialize new map");
         LevelManager.InitializeMapEvent += PrintLevelMap;
@@ -72,7 +72,7 @@ public class DiffusionProcessingTest_DiffusionExecuting:MonoBehaviour
         StringBuilder valueStr = new StringBuilder();
         StringBuilder dirStr=new StringBuilder();
         ValuableCell cell;
-        for(int i = LevelManager.MaxHeight_; i >=0 ; i--)
+        for(int i = LevelManager.MaxHeight_-1; i >=0 ; i--)
         {
             for (int w = LevelManager.IsFirstCellBottom_ ? 1 : 0; w < LevelManager.Width_; w += 2)
             {
@@ -86,6 +86,7 @@ public class DiffusionProcessingTest_DiffusionExecuting:MonoBehaviour
                 {
                     valueStr.Append(" X |");
                     dirStr.Append(" X|");
+                    continue;
                 }
                 else
                     valueStr.Append(cell.Value_.ToString() + "|");
@@ -127,6 +128,12 @@ public class DiffusionProcessingTest_DiffusionExecuting:MonoBehaviour
                     dirStr.Append("___");
                 }
             }
+            mainStr.Append(valueStr);
+            mainStr.Append("_____");
+            mainStr.Append(dirStr);
+            mainStr.Append("\n");
+            valueStr.Clear();
+            dirStr.Clear();
             for(int w = LevelManager.IsFirstCellBottom_ ? 0 : 1; w < LevelManager.Width_; w += 2)
             {
                 if (!LevelManager.IsFirstCellBottom_)
@@ -139,6 +146,7 @@ public class DiffusionProcessingTest_DiffusionExecuting:MonoBehaviour
                 {
                     valueStr.Append(" X |");
                     dirStr.Append(" X|");
+                    continue;
                 }
                 else
                     valueStr.Append(cell.Value_.ToString() + "|");
