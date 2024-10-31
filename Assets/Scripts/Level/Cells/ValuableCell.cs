@@ -16,6 +16,8 @@ namespace Derevo.Level
             this.DiffDirection = DiffDirection;
         }
         public const int MaxDiffusionDirectionDigitsCount = 6;
+        public const int MaxDIffusionDirectionValue = 63;
+        public const DiffusionDirection DefaultDirection = DiffusionDirection.Top;
         public enum DiffusionDirection : ushort
         {
             TopRight=1,
@@ -140,7 +142,7 @@ namespace Derevo.Level
         }
         protected bool TrySetDiffusionDirectionField(ref DiffusionDirection directionField, DiffusionDirection newDirection, int column, int row)
         {
-            if ((int)newDirection > 255)
+            if ((int)newDirection > MaxDIffusionDirectionValue)
                 return false;
 
             Vector2Int cellPos = new Vector2Int(column, row);

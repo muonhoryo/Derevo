@@ -17,7 +17,7 @@ namespace Derevo.Level
             get => ExtendDirection;
             set
             {
-                if ((ushort)value> 255)
+                if ((ushort)value> MaxDIffusionDirectionValue)
                     return;
 
                 ExtendDirection = value;
