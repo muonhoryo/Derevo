@@ -5,13 +5,13 @@ using UnityEngine.SceneManagement;
 
 namespace Derevo.Serialization
 {
-    public sealed class GameInitialization : MonoBehaviour
+    public sealed class InitializationSceneTransition : MonoBehaviour
     {
-        [SerializeField] private string NextSceneName;
+        [SerializeField] private string MainMenuSceneName;
         private void Start()
         {
             GlobalConstsSerialization.DeserializeGlobalConsts();
-            SceneManager.LoadScene(NextSceneName, LoadSceneMode.Single);
+            SceneManager.LoadScene(MainMenuSceneName, LoadSceneMode.Single);
         }
     }
 }

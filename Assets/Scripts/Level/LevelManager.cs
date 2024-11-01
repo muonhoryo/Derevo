@@ -195,7 +195,7 @@ namespace Derevo.Level
         }
         public static LevelMapInfo GetLevelMapInfo()
         {
-            throw new Exception("MRE");
+            return LevelMapInfo.ConvertLevelMapToSerializationInfo(LevelMap);
         }
         public static void InitializeLevel(LevelMapInfo info)
         {
@@ -203,12 +203,12 @@ namespace Derevo.Level
                 throw new Exception("Invalid LevelMapInfo.");
 
             IsFirstCellBottom = info.IsFirstCellBottom;
-            LevelMap = new LevelCell[info.CellsInfo.Length][];
-            Func<LevelCellInfo, LevelCell> selectFunc = (cellInfo) =>
-                cellInfo.InitializeCell();
+            LevelMap = new LevelCell[info.ColumnsInfo.Length][];
+            Func<LevelMapCellInfo, LevelCell> selectFunc = (cellInfo) =>
+                LevelMapCellInfo.InitializeCell(cellInfo);
             for(int i = 0; i < Width_; i++)
             {
-                LevelMap[i] = info.CellsInfo[i].Select(selectFunc).ToArray();
+                LevelMap[i] = info.ColumnsInfo[i].CellsInfo.Select(selectFunc).ToArray();
                 if (LevelMap[i].Length>MaxHeight)
                     MaxHeight = LevelMap[i].Length;
             }
@@ -244,17 +244,17 @@ namespace Derevo.Level
         }
         private static bool ValidateLevelMapInfo(LevelMapInfo info)
         {
-            if (info.CellsInfo==null)
+            //Debug.Log(info.ColumnsInfo);
+            //Debug.Log(info.ColumnsInfo.Length);
+            //Debug.Log(info.ColumnsInfo[0].CellsInfo);
+            //Debug.Log(info.ColumnsInfo[0].CellsInfo.Length);
+
+            if (info.ColumnsInfo == null)
                 return false;
-            foreach (var column in info.CellsInfo)
+            foreach (var columnInfo in info.ColumnsInfo)
             {
-                if (column==null)
+                if (columnInfo.CellsInfo==null)
                     return false;
-                foreach(var cell in column)
-                {
-                    if (cell == null)
-                        return false;
-                }
             }
             return true;
         }

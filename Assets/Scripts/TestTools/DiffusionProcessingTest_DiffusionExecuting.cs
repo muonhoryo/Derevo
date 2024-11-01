@@ -10,39 +10,38 @@ public class DiffusionProcessingTest_DiffusionExecuting:MonoBehaviour
     private LevelManager.LevelMapInfo Map = new();
     private void Awake()
     {
-        const int height=4;
-        LevelManager.LevelCellInfo[][] mapCells = new LevelManager.LevelCellInfo[][]
+        const int maxHeight=4;
+        LevelManager.LevelMapCellInfo[][] mapCells = new LevelManager.LevelMapCellInfo[][]
         {
-            new LevelManager.LevelCellInfo[height]
+            new LevelManager.LevelMapCellInfo[maxHeight]
             {
-                new LevelManager.ValuableCellInfo(0),
-                new LevelManager.ValuableCellInfo(0),
-                new LevelManager.ValuableCellInfo(0),
-                new LevelManager.ValuableCellInfo(0)
+                new LevelManager.LevelMapCellInfo(true,0,0),
+                new LevelManager.LevelMapCellInfo(true,0,0),
+                new LevelManager.LevelMapCellInfo(true,0,0),
+                new LevelManager.LevelMapCellInfo(true,0,0)
             },
-            new LevelManager.LevelCellInfo[height]
+            new LevelManager.LevelMapCellInfo[maxHeight]
             {
-                new LevelManager.ValuableCellInfo(0),
-                new LevelManager.ExtenderCellInfo(0,ValuableCell.DiffusionDirection.BottomRight),
-                new LevelManager.ExtenderCellInfo(9,ValuableCell.DiffusionDirection.Bottom),
-                new LevelManager.ValuableCellInfo(0)
+                new LevelManager.LevelMapCellInfo(true,0,0),
+                new LevelManager.LevelMapCellInfo(true,0,(ushort)ValuableCell.DiffusionDirection.BottomRight),
+                new LevelManager.LevelMapCellInfo(true,9,(ushort)ValuableCell.DiffusionDirection.Bottom),
+                new LevelManager.LevelMapCellInfo (true, 0, 0)
             },
-            new LevelManager.LevelCellInfo[height]
+            new LevelManager.LevelMapCellInfo[3]
             {
-                new LevelManager.ValuableCellInfo(0),
-                new LevelManager.ExtenderCellInfo(0,ValuableCell.DiffusionDirection.Top),
-                new LevelManager.ValuableCellInfo(0),
-                new LevelManager.ValuableCellInfo(0)
+                new LevelManager.LevelMapCellInfo(true,0,0),
+                new LevelManager.LevelMapCellInfo(true,0,(ushort)ValuableCell.DiffusionDirection.Top),
+                new LevelManager.LevelMapCellInfo (true, 0, 0)
             },
-            new LevelManager.LevelCellInfo[height]
+            new LevelManager.LevelMapCellInfo[maxHeight]
             {
-                new LevelManager.ValuableCellInfo(0),
-                new LevelManager.ValuableCellInfo(0),
-                new LevelManager.ValuableCellInfo(0),
-                new LevelManager.ValuableCellInfo(0)
+                new LevelManager.LevelMapCellInfo (true, 0, 0),
+                new LevelManager.LevelMapCellInfo (true, 0, 0),
+                new LevelManager.LevelMapCellInfo (true, 0, 0),
+                new LevelManager.LevelMapCellInfo (false, 0, 0)
             }
         };
-        Map.CellsInfo = mapCells;
+        Map.ColumnsInfo = LevelManager.LevelMapColumnInfo.ConvertMapInfoToColumnsInfo(mapCells);
         Map.IsFirstCellBottom = false;
 
         LevelManager.InitializeMapEvent += () => Debug.Log("initialize new map");
@@ -66,7 +65,7 @@ public class DiffusionProcessingTest_DiffusionExecuting:MonoBehaviour
         PrintLevelMap();
     }
 
-    private void PrintLevelMap()
+    public static void PrintLevelMap()
     {
         StringBuilder mainStr = new StringBuilder();
         StringBuilder valueStr = new StringBuilder();

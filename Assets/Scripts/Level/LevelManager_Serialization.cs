@@ -1,6 +1,7 @@
 
 
 using System;
+using UnityEngine;
 
 namespace Derevo.Level
 {
@@ -9,50 +10,92 @@ namespace Derevo.Level
         [Serializable]
         public struct LevelMapInfo
         {
-            public LevelCellInfo[][] CellsInfo;
+            public LevelMapColumnInfo[] ColumnsInfo;
             public bool IsFirstCellBottom;
-        }
 
-        public abstract class LevelCellInfo 
-        {
-            public abstract LevelCell InitializeCell();
-        }
-        [Serializable]
-        public sealed class BlockCellInfo : LevelCellInfo
-        {
-            public override LevelCell InitializeCell()
+            public static LevelMapInfo ConvertLevelMapToSerializationInfo(in LevelCell[][] mapInfo)
             {
-                return new BlockCell();
+                LevelMapInfo info=new LevelMapInfo();
+                info.ColumnsInfo=new LevelMapColumnInfo[mapInfo.Length];
+                for(int i = 0; i < info.ColumnsInfo.Length; i++)
+                {
+                    info.ColumnsInfo[i].CellsInfo = new LevelMapCellInfo[mapInfo[i].Length];
+                    for (int j=0;j< mapInfo[i].Length; j++)
+                    {
+                        info.ColumnsInfo[i].CellsInfo[j] = LevelMapCellInfo.GetLevelCellInfo(mapInfo[i][j]);
+                    }
+                }
+                return info;
             }
         }
         [Serializable]
-        public class ValuableCellInfo : LevelCellInfo
+        public struct LevelMapColumnInfo
         {
-            public ValuableCellInfo(int Value) 
+            public LevelMapColumnInfo(LevelMapCellInfo[] CellsInfo)
             {
+                this.CellsInfo= CellsInfo;
+            }
+
+            public LevelMapCellInfo[] CellsInfo;
+
+            public static LevelMapColumnInfo[] ConvertMapInfoToColumnsInfo(in LevelMapCellInfo[][] cellInfo)
+            {
+                LevelMapColumnInfo[] columnsInfo=new LevelMapColumnInfo[cellInfo.Length];
+                for(int i = 0; i < cellInfo.Length; i++)
+                {
+                    columnsInfo[i] = new LevelMapColumnInfo();
+                    columnsInfo[i].CellsInfo = cellInfo[i];
+                }
+                return columnsInfo;
+            }
+        }
+
+        [Serializable]
+        public struct LevelMapCellInfo
+        {
+            public LevelMapCellInfo(bool IsValuable,int Value,ushort ExtendDirection)
+            {
+                this.IsValuable = IsValuable;
                 this.Value = Value;
+                this.ExtendDirection= ExtendDirection;
             }
+            public bool IsValuable;
+            public int Value;
+            public ushort ExtendDirection;
 
-            public readonly int Value;
-
-            public override LevelCell InitializeCell()
+            public static LevelCell InitializeCell(LevelMapCellInfo cellInfo)
             {
-                return new ValuableCell(Value, 0);
+                int GetValidatedValue()
+                {
+                    return cellInfo.Value>=0?cellInfo.Value : 0;
+                }
+                ValuableCell.DiffusionDirection GetValidatedDirection()
+                {
+                    return cellInfo.ExtendDirection <= ValuableCell.MaxDIffusionDirectionValue ? (ValuableCell.DiffusionDirection)cellInfo.ExtendDirection : ValuableCell.DefaultDirection;
+                }
+
+                if (!cellInfo.IsValuable)
+                {
+                    return new BlockCell();
+                }
+                else if (cellInfo.ExtendDirection == 0)
+                {
+                    return new ValuableCell(GetValidatedValue(), 0);
+                }
+                else
+                {
+                    return new ExtenderCell(GetValidatedValue(), 0, GetValidatedDirection());
+                }
             }
-        }
-        [Serializable]
-        public sealed class ExtenderCellInfo:ValuableCellInfo
-        {
-            public ExtenderCellInfo(int Value,ValuableCell.DiffusionDirection ExtendDirection):base(Value)
+            public static LevelMapCellInfo GetLevelCellInfo(LevelCell cell)
             {
-                this.ExtendDirection=ExtendDirection;
-            }
-
-            public readonly ValuableCell.DiffusionDirection ExtendDirection;
-
-            public override LevelCell InitializeCell()
-            {
-                return new ExtenderCell(Value, 0, ExtendDirection);
+                if(cell is ExtenderCell exCel)
+                    return new LevelMapCellInfo(true, exCel.Value_, (ushort)exCel.ExtendDirection_);
+                else if(cell is ValuableCell valCel)
+                    return new LevelMapCellInfo(true, valCel.Value_, 0);
+                else
+                    return new LevelMapCellInfo(false, 0, 0);
+                    
             }
         }
     }
