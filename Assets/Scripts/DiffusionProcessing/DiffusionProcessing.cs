@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Derevo.Level;
+using Derevo.PlayerControl;
 using UnityEngine;
 
 namespace Derevo.DiffusionProcessing
@@ -16,8 +17,17 @@ namespace Derevo.DiffusionProcessing
             public int?[][] PostDiffMap;
         }
 
-        public static event Action StartDiffusionEvent=delegate { };
-        public static event Action EndDiffusionEvent = delegate { };
+        public static event Action StartDiffusionEvent= StartDiffusionEventAction;
+        public static event Action EndDiffusionEvent = EndDIffusionEventAction;
+
+        private static void StartDiffusionEventAction()
+        {
+            PlayerControlLocker.Lock();
+        }
+        private static void EndDIffusionEventAction()
+        {
+            PlayerControlLocker.Unlock();
+        }
 
         public static DiffusionProcessInfo LastStartedProcessInfo_ { get; private set; }
         public static bool IsInProcess_ { get; private set; } = false;

@@ -147,27 +147,30 @@ namespace Derevo.Level
 
             return LevelMap[column][row];
         }
-        public static void SetCellValue(int value,int column,int row)
+        public static bool TrySetCellValue(int value,int column,int row)
         {
             if (!CheckCellPos(column, row))
-                return;
+                return false;
 
             var parsCell= LevelMap[column][row] as ValuableCell;
             if (parsCell != null)
             {
-                InternalSetCellValue(parsCell, value, column, row);
+                return InternalTrySetCellValue(parsCell, value, column, row);
             }
+            else
+                return false;
         }
-        public static void SetCellDiffusionDirection(ValuableCell.DiffusionDirection direction,int column,int row)
+        public static bool TrySetCellDiffusionDirection(ValuableCell.DiffusionDirection direction,int column,int row)
         {
             if (!CheckCellPos(column, row))
-                return;
+                return false;
 
             var parsCell = LevelMap[column][row] as ValuableCell;
             if (parsCell != null)
             {
-                InternalSetDiffusionDirection(parsCell, direction, column, row);
+                return InternalTrySetDiffusionDirection(parsCell, direction, column, row);
             }
+            return false;
         }
         public static void ResetValuableCellsDirections()
         {
@@ -178,7 +181,7 @@ namespace Derevo.Level
                     var parsCell = LevelMap[i][j] as ValuableCell;
                     if (parsCell != null)
                     {
-                        InternalSetDiffusionDirection(parsCell,0, i, j);
+                        InternalTrySetDiffusionDirection(parsCell,0, i, j);
                     }
                 }
             }
@@ -212,6 +215,7 @@ namespace Derevo.Level
                 if (LevelMap[i].Length>MaxHeight)
                     MaxHeight = LevelMap[i].Length;
             }
+            DiffusionParticlesManager.Initialize(info.ParticlesCount);
             InitializeMapEvent();
         }
 
@@ -221,34 +225,30 @@ namespace Derevo.Level
                 row >= 0 && row < LevelMap[column].Length;
         }
 
-        private static void InternalSetCellValue(ValuableCell target, int value, int column, int row)
+        private static bool InternalTrySetCellValue(ValuableCell target, int value, int column, int row)
         {
             int oldValue = target.Value_;
-            target.Value_ = value;
-            if (oldValue == target.Value_)
-                return;
+            if(!target.TrySetValue(value))
+                return false;
 
             var info = new ChangeCellValueEventInfo(target, oldValue, value, column, row);
             ChangeCellValueEvent(info);
+            return true;
         }
-        private static void InternalSetDiffusionDirection(ValuableCell target, ValuableCell.DiffusionDirection direction, int column, int row)
+        private static bool InternalTrySetDiffusionDirection(ValuableCell target, ValuableCell.DiffusionDirection direction, int column, int row)
         {
             ValuableCell.DiffusionDirection oldValue = target.DiffusionDirection_;
             if(!target.TrySetDiffusionDirection(direction, column, row))
             {
-                return;
+                return false;
             }
 
             var info = new ChangeCellDiffDIrectionEventInfo(target, oldValue, direction, column, row);
             ChangeCellDiffDirectionEvent(info);
+            return true;
         }
         private static bool ValidateLevelMapInfo(LevelMapInfo info)
         {
-            //Debug.Log(info.ColumnsInfo);
-            //Debug.Log(info.ColumnsInfo.Length);
-            //Debug.Log(info.ColumnsInfo[0].CellsInfo);
-            //Debug.Log(info.ColumnsInfo[0].CellsInfo.Length);
-
             if (info.ColumnsInfo == null)
                 return false;
             foreach (var columnInfo in info.ColumnsInfo)

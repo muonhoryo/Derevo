@@ -10,9 +10,9 @@ namespace Derevo.Level
     public class ValuableCell : LevelCell
     {
         public ValuableCell() { }
-        public ValuableCell(int Value_, DiffusionDirection DiffDirection)
+        public ValuableCell(int Value, DiffusionDirection DiffDirection)
         {
-            this.Value_ = Value_;
+            this.Value = Value;
             this.DiffDirection = DiffDirection;
         }
         public const int MaxDiffusionDirectionDigitsCount = 6;
@@ -81,17 +81,7 @@ namespace Derevo.Level
         private int Value = 0;
         private DiffusionDirection DiffDirection = 0;
 
-        public int Value_
-        {
-            get => Value;
-            set
-            {
-                if (value < 0)
-                    return;
-
-                Value = value;
-            }
-        }
+        public int Value_ => Value;
         public DiffusionDirection DiffusionDirection_ => DiffDirection;
 
         public virtual Vector2Int[] GetConnectedCellsPoses(Vector2Int cellPos)
@@ -105,6 +95,30 @@ namespace Derevo.Level
         public bool TrySetDiffusionDirection(DiffusionDirection direction, int column, int row)
         {
             return TrySetDiffusionDirectionField(ref DiffDirection, direction, column, row);
+        }
+        public bool TrySetValue(int value)
+        {
+            if (value < 0||value==Value)
+                return false;
+            else
+            {
+                Value = value;
+                return true;
+            }
+        }
+        public void SetDefaultDirection(Vector2Int cellPos)
+        {
+            if (!TrySetDiffusionDirection(DefaultDirection, cellPos.x,cellPos.y))
+            {
+                for(int i = 0; i < MaxDiffusionDirectionDigitsCount; i++)
+                {
+                    DiffusionDirection newDir = (DiffusionDirection)(1 << i);
+                    if (newDir == DefaultDirection)
+                        continue;
+                    if (TrySetDiffusionDirection(newDir, cellPos.x, cellPos.y))
+                        return;
+                }
+            }
         }
 
         protected Vector2Int[] GetCellsFromDirection(DiffusionDirection direction, Vector2Int cellPos)

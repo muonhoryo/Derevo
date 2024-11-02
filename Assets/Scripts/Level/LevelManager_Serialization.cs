@@ -12,6 +12,7 @@ namespace Derevo.Level
         {
             public LevelMapColumnInfo[] ColumnsInfo;
             public bool IsFirstCellBottom;
+            public int ParticlesCount;
 
             public static LevelMapInfo ConvertLevelMapToSerializationInfo(in LevelCell[][] mapInfo)
             {

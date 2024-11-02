@@ -59,7 +59,7 @@ public class DiffusionProcessingTest_DiffusionExecuting:MonoBehaviour
         DiffusionProcessing.StartDiffusionEvent += PrintDiffusionInfo;
 
         LevelManager.InitializeLevel(Map);
-        LevelManager.SetCellDiffusionDirection(ValuableCell.DiffusionDirection.Top, 2, 0);
+        LevelManager.TrySetCellDiffusionDirection(ValuableCell.DiffusionDirection.Top, 2, 0);
         PrintLevelMap();
         DiffusionProcessing.StartDiffusion();
         PrintLevelMap();

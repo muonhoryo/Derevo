@@ -44,12 +44,12 @@ namespace Derevo.DiffusionProcessing
                 int i = 0;
                 for (; rem > 0; i++)
                 {
-                    LevelManager.SetCellValue(onlyValue + 1, Members[i].CellPosition_.x, Members[i].CellPosition_.y);
+                    LevelManager.TrySetCellValue(onlyValue + 1, Members[i].CellPosition_.x, Members[i].CellPosition_.y);
                     rem--;
                 }
                 for (; i < Members.Count; i++)
                 {
-                    LevelManager.SetCellValue(onlyValue, Members[i].CellPosition_.x, Members[i].CellPosition_.y);
+                    LevelManager.TrySetCellValue(onlyValue, Members[i].CellPosition_.x, Members[i].CellPosition_.y);
                 }
             }
             else
@@ -57,7 +57,7 @@ namespace Derevo.DiffusionProcessing
                 onlyValue = sum / Members.Count;
                 foreach (var member in Members)
                 {
-                    LevelManager.SetCellValue(onlyValue, member.CellPosition_.x, member.CellPosition_.y);
+                    LevelManager.TrySetCellValue(onlyValue, member.CellPosition_.x, member.CellPosition_.y);
                 }
             }
         }
