@@ -1,8 +1,8 @@
 
 
 using System;
-using System.Buffers;
 using Derevo.PlayerControl;
+using UnityEngine;
 
 namespace Derevo.Level
 {
@@ -31,21 +31,29 @@ namespace Derevo.Level
 
         public static void ReselectTarget(UnfixedCell cell)
         {
-            if (cell == null )
+            if (cell == null||
+                cell==Target)
                 return;
-            ValuableCell valCell = GetCellFromLevelManager();
+            ValuableCell valCell = GetCellFromLevelManager(cell);
             if (valCell==null||
                 (valCell.Value_ != 0 && valCell.DiffusionDirection_ == 0))
                 return;
 
             var info = new ReselectTargetEventInfo(Target, cell);
-            Target = cell;
             if (valCell.Value_== 0) //Mark cell as unfixed
             {
-                valCell.SetDefaultDirection(Target.OwnerPos_);
-                valCell.TrySetValue(1);
+                if (DiffusionParticlesManager.TryDecreaseParticlesCount(1))
+                {
+                    LevelManager.TrySetCellDefaultDiffDirection(cell.OwnerPos_.x, cell.OwnerPos_.y);
+                    LevelManager.TrySetCellValue(1, cell.OwnerPos_.x, cell.OwnerPos_.y);
+                }
+                else
+                {
+                    UnselectCurrentTarget();
+                    return;
+                }
             }
-
+            Target = cell;
             ReselectTargetEvent(info);
         }
         public static void UnselectCurrentTarget()
@@ -66,7 +74,7 @@ namespace Derevo.Level
             if (value < 0)
                 return false;
 
-            ValuableCell cell = GetCellFromLevelManager();
+            ValuableCell cell = GetCellFromLevelManager(Target);
             int diff = value - cell.Value_;
             if (diff == 0)
                 return false;
@@ -76,7 +84,7 @@ namespace Derevo.Level
                 bool result= LevelManager.TrySetCellValue(value, Target.OwnerPos_.x, Target.OwnerPos_.y);
                 if (cell.Value_ == 0)
                 {
-                    cell.TrySetDiffusionDirection(0, Target.OwnerPos_.x, Target.OwnerPos_.y);
+                    LevelManager.TrySetCellDiffusionDirection(0, Target.OwnerPos_.x, Target.OwnerPos_.y);
                     UnselectCurrentTarget();
                 }
                 return result;
@@ -85,18 +93,19 @@ namespace Derevo.Level
             {
                 if (DiffusionParticlesManager.TryDecreaseParticlesCount(diff))
                 {
-                    return LevelManager.TrySetCellValue(value, Target.OwnerPos_.x, Target.OwnerPos_.y);
+                    bool result = LevelManager.TrySetCellValue(value, Target.OwnerPos_.x, Target.OwnerPos_.y);
+                    return result;
                 }
                 else
                     return false;
             }
         }
         public static int GetTargetValue() =>
-            GetCellFromLevelManager().Value_;
+            GetCellFromLevelManager(Target).Value_;
 
-        private static ValuableCell GetCellFromLevelManager()
+        private static ValuableCell GetCellFromLevelManager(UnfixedCell cell)
         {
-            return LevelManager.GetCell(Target.OwnerPos_.x, Target.OwnerPos_.y) as ValuableCell;
+            return LevelManager.GetCell(cell.OwnerPos_.x, cell.OwnerPos_.y) as ValuableCell;
         }
     }
 }

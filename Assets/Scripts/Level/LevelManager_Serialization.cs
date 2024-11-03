@@ -72,7 +72,7 @@ namespace Derevo.Level
                 }
                 ValuableCell.DiffusionDirection GetValidatedDirection()
                 {
-                    return cellInfo.ExtendDirection <= ValuableCell.MaxDIffusionDirectionValue ? (ValuableCell.DiffusionDirection)cellInfo.ExtendDirection : ValuableCell.DefaultDirection;
+                    return cellInfo.ExtendDirection <= ValuableCell.MaxDiffusionDirectionValue ? (ValuableCell.DiffusionDirection)cellInfo.ExtendDirection : ValuableCell.DefaultDirection;
                 }
 
                 if (!cellInfo.IsValuable)

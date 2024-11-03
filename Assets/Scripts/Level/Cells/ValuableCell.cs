@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Derevo.DiffusionProcessing;
+using Unity.VisualScripting;
 using UnityEngine;
 using static UnityEditor.PlayerSettings;
 
@@ -16,7 +17,7 @@ namespace Derevo.Level
             this.DiffDirection = DiffDirection;
         }
         public const int MaxDiffusionDirectionDigitsCount = 6;
-        public const int MaxDIffusionDirectionValue = 63;
+        public const int MaxDiffusionDirectionValue = 64;
         public const DiffusionDirection DefaultDirection = DiffusionDirection.Top;
         public enum DiffusionDirection : ushort
         {
@@ -25,7 +26,8 @@ namespace Derevo.Level
             TopLeft=4,
             BottomLeft=8,
             Bottom=16,
-            BottomRight=32
+            BottomRight=32,
+            CannotHaveDirections=64
         }
         protected Vector2Int GetPositionFromDirectionByDigit(int digit, Vector2Int cellPos)
         {
@@ -118,6 +120,7 @@ namespace Derevo.Level
                     if (TrySetDiffusionDirection(newDir, cellPos.x, cellPos.y))
                         return;
                 }
+                TrySetDiffusionDirection(DiffusionDirection.CannotHaveDirections,cellPos.x, cellPos.y);
             }
         }
 
@@ -156,7 +159,7 @@ namespace Derevo.Level
         }
         protected bool TrySetDiffusionDirectionField(ref DiffusionDirection directionField, DiffusionDirection newDirection, int column, int row)
         {
-            if ((int)newDirection > MaxDIffusionDirectionValue)
+            if ((int)newDirection > MaxDiffusionDirectionValue)
                 return false;
 
             Vector2Int cellPos = new Vector2Int(column, row);
@@ -192,6 +195,27 @@ namespace Derevo.Level
             {
                 Value = parsSource.Value;
                 DiffDirection = parsSource.DiffDirection;
+            }
+        }
+
+        public static float GetRotationValueFromDirection(DiffusionDirection direction)
+        {
+            switch (direction)
+            {
+                case DiffusionDirection.TopRight:
+                    return 30;
+                case DiffusionDirection.Top:
+                    return 90;
+                case DiffusionDirection.TopLeft:
+                    return 150;
+                case DiffusionDirection.BottomLeft:
+                    return 210;
+                case DiffusionDirection.Bottom:
+                    return 270;
+                case DiffusionDirection.BottomRight:
+                    return 330;
+                default:
+                    return 0;
             }
         }
     }

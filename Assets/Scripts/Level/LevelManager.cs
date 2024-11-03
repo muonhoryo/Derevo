@@ -172,6 +172,18 @@ namespace Derevo.Level
             }
             return false;
         }
+        public static bool TrySetCellDefaultDiffDirection(int column,int row)
+        {
+            if (!CheckCellPos(column, row))
+                return false;
+
+            var parsCell = LevelMap[column][row] as ValuableCell;
+            if (parsCell != null) 
+            {
+                return InternalTrySetDefaultDiffDirection(parsCell, column, row);
+            }
+            return false;
+        }
         public static void ResetValuableCellsDirections()
         {
             for(int i = 0; i < Width_; i++)
@@ -244,6 +256,17 @@ namespace Derevo.Level
             }
 
             var info = new ChangeCellDiffDIrectionEventInfo(target, oldValue, direction, column, row);
+            ChangeCellDiffDirectionEvent(info);
+            return true;
+        }
+        private static bool InternalTrySetDefaultDiffDirection(ValuableCell target,int column,int row)
+        {
+            ValuableCell.DiffusionDirection oldValue = target.DiffusionDirection_;
+            target.SetDefaultDirection(new Vector2Int(column, row));
+            if (oldValue == target.DiffusionDirection_)
+                return false;
+
+            var info=new ChangeCellDiffDIrectionEventInfo(target,oldValue,target.DiffusionDirection_,column, row);
             ChangeCellDiffDirectionEvent(info);
             return true;
         }
