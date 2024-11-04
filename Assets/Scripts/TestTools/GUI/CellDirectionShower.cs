@@ -24,7 +24,8 @@ namespace Derevo.GUI
         {
             if (info.ChangedCell == Target)
             {
-                if (info.NewDirection != 0)
+                if (info.NewDirection != 0&&
+                    info.NewDirection!=ValuableCell.DiffusionDirection.CannotHaveDirections)
                 {
                     if (!DiffusionDirectionObj.activeSelf)
                         DiffusionDirectionObj.SetActive(true);

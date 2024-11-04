@@ -164,34 +164,36 @@ namespace Derevo.Level
             int parNewDir = (int)newDirection;
             if (parNewDir> MaxDiffusionDirectionValue)
                 return false;
-            if (newDirection == DiffusionDirection.CannotHaveDirections)
+            if (newDirection != DiffusionDirection.CannotHaveDirections&&
+                newDirection!=0)
             {
-                directionField = newDirection;
-                return true;
-            }
-
-            Vector2Int cellPos = new Vector2Int(column, row);
-            Vector2Int connPos;
-            int mask =  1;
-            for(int i = 0; i < 8; i++)
-            {
-                if(TryGetPositionFromDirectionByDigit(newDirection,i,cellPos,out connPos)) //In direction mask this direction is written
+                Vector2Int cellPos = new Vector2Int(column, row);
+                Vector2Int connPos;
+                int mask = 1;
+                for (int i = 0; i < 8; i++)
                 {
-                    //if (i == 1)
-                    //{
-                    //    void PrintDigits(int value)
-                    //    {
-                    //        StringBuilder str = new StringBuilder(32);
-                    //        for(int i = 0; i < 32; i++)
-                    //        {
-                    //            str.Append((value & 1 << i) == 0 ? 0 : 1);
-                    //        }
-                    //        Debug.Log(str.ToString());
-                    //    }
-                    //}
+                    if (TryGetPositionFromDirectionByDigit(newDirection, i, cellPos, out connPos)) //In direction mask this direction is written
+                    {
+                        //if (i == 1)
+                        //{
+                        //    void PrintDigits(int value)
+                        //    {
+                        //        StringBuilder str = new StringBuilder(32);
+                        //        for(int i = 0; i < 32; i++)
+                        //        {
+                        //            str.Append((value & 1 << i) == 0 ? 0 : 1);
+                        //        }
+                        //        Debug.Log(str.ToString());
+                        //    }
+                        //}
 
-                    if (!CheckCellConnection(connPos))
-                        newDirection =(DiffusionDirection)((int)newDirection & ~(mask << i));
+                        if (!CheckCellConnection(connPos))
+                            newDirection = (DiffusionDirection)((int)newDirection & ~(mask << i));
+                    }
+                }
+                if (newDirection == 0) //Result haven't any options to set new direction so return false
+                {
+                    return false;
                 }
             }
             if (directionField != newDirection)
