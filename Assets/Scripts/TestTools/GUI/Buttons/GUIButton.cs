@@ -1,5 +1,6 @@
 
 
+using Derevo.PlayerControl;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -9,7 +10,10 @@ namespace Derevo.GUI
     {
         public void OnPointerDown(PointerEventData eventData)
         {
-            OnClickAction();
+            if (!PlayerControlLocker.IsLocked_)
+            {
+                OnClickAction();
+            }
         }
         protected abstract void OnClickAction();
     }

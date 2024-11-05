@@ -44,8 +44,10 @@ namespace Derevo.PlayerControl
         }
         void IPointerDownHandler.OnPointerDown(PointerEventData eventData)
         {
-            if(!PlayerControlLocker.IsLocked_)
+            if (!PlayerControlLocker.IsLocked_)
+            {
                 UnfixedCellsManager.ReselectTarget(this);
+            }
         }
         protected override void LockAction() { }
         protected override void UnlockAction() { }
