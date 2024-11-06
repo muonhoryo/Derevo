@@ -59,7 +59,7 @@ namespace Derevo
         }
         private void Lose()
         {
-            LoseMessage.SetActive(false);
+            LoseMessage.SetActive(true); 
         }
     }
 }

@@ -1,11 +1,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using Derevo.DiffusionProcessing;
-using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 
 namespace Derevo.Level
 {

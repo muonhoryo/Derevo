@@ -1,6 +1,7 @@
 
 
 using System;
+using Derevo.PlayerControl;
 using Derevo.Serialization;
 using UnityEngine;
 
@@ -14,6 +15,7 @@ namespace Derevo.Level
         {
             LevelManager.LevelMapInfo info = LevelMapSerialization.DeserializeMapInfo(LevelName);
             LevelManager.InitializeLevel(info);
+            PlayerControlLocker.Unlock();
             LevelLoadingDoneEvent();
         }
     }

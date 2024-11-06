@@ -12,14 +12,10 @@ public sealed class GlobalConstsHandler : MonoBehaviour
 
     private void Awake()
     {
-#if UNITY_EDITOR
         if (Instance_ != null)
             throw new System.Exception("Have more than one GlobalConstsHandler");
-        else
-            Instance_= Consts;
-#else
-                GlobalConsts.Instance = Consts;
-#endif
+
+        Instance_ = Consts;
         Destroy(this);
     }
 }

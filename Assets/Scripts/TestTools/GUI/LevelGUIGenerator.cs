@@ -17,9 +17,17 @@ namespace Derevo.GUI
         private void Awake()
         {
             Instance_ = this;
+            GameSceneLevelInitialization.LevelLoadingDoneEvent += OnLoadingLevelAction;
+        }
+        private void OnDestroy()
+        {
+            GameSceneLevelInitialization.LevelLoadingDoneEvent -= OnLoadingLevelAction;
+        }
+        private void OnLoadingLevelAction()
+        {
+            GenerateLevel();
         }
 
-        [ContextMenu("GenerateLevel")]
         public void GenerateLevelTest()
         {
             GenerateLevel();
