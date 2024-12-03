@@ -64,7 +64,7 @@ namespace Derevo.GUI
                 Destroy(unfxdCell.BlockCellVisual);
                 button.GetComponent<CellDirectionShower>().Initialize(parCell);
                 button.GetComponent<CellParticleCounter>().Initialize(parCell);
-                if(parCell.Value_!=0&&parCell.DiffusionDirection_==0)
+                if(!parCell.IsUnfixed_)
                 {
                     Destroy(unfxdCell);
                 }

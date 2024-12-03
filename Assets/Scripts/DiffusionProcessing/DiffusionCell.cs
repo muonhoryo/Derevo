@@ -24,6 +24,10 @@ namespace Derevo.DiffusionProcessing
 
         public DiffusionProcess GetDiffusionProcess(int cellColumn,int cellRow)
         {
+            return InternalGetDiffusionProcess(cellColumn, cellRow, new DiffusionProcess(this));
+        }
+        private DiffusionProcess InternalGetDiffusionProcess(int cellColumn,int cellRow,in DiffusionProcess defaultProc)
+        {
             if (CurrentDiffProc != null)
                 return CurrentDiffProc;
 
@@ -32,38 +36,46 @@ namespace Derevo.DiffusionProcessing
             if (parCell == null)
                 return null;
 
-            var connectedCellsPoses = parCell.GetConnectedCellsPoses(new Vector2Int(cellColumn,cellRow)).ToArray();
+            var connectedCellsPoses = parCell.GetConnectedCellsPoses(new Vector2Int(cellColumn, cellRow)).ToArray();
 
             if (connectedCellsPoses.Length == 0)
                 return new DiffusionProcess(this);
 
-            var connectedCells = connectedCellsPoses.Select((pos)=>DiffusionProcessing.GetDiffusionCell(pos.x,pos.y)).ToArray();
+            var connectedCells = connectedCellsPoses.Select((pos) => DiffusionProcessing.GetDiffusionCell(pos.x, pos.y)).ToArray();
 
             DiffusionProcess GetProcess(int arrayIndex)
             {
                 var connCellPos = connectedCellsPoses[arrayIndex];
-                return connectedCells[arrayIndex].GetDiffusionProcess(connCellPos.x,connCellPos.y);
+                return connectedCells[arrayIndex].InternalGetDiffusionProcess(connCellPos.x, connCellPos.y,CurrentDiffProc);
             }
 
-            for(int i = 0; i < connectedCells.Length; i++)
+            CurrentDiffProc = defaultProc;
+            bool isInitializeProc = false;
+
+            for (int i = 0; i < connectedCells.Length; i++)
             {
                 var diffProc = GetProcess(i);
-                if(CurrentDiffProc==null&&
-                    diffProc != null)
+                if (!isInitializeProc)
                 {
-                    CurrentDiffProc= diffProc;
+                    if (diffProc != CurrentDiffProc)
+                    {
+                        CurrentDiffProc = diffProc;
+                    }
+                    isInitializeProc= true;
                     CurrentDiffProc.AddMember(this);
                 }
-                else if (CurrentDiffProc != diffProc)
+                else if(CurrentDiffProc!=diffProc)
                 {
                     CurrentDiffProc.Aggregate(diffProc);
                 }
             }
-            if (CurrentDiffProc == null)
-                CurrentDiffProc = new DiffusionProcess(this);
+            if (!isInitializeProc)
+                CurrentDiffProc.AddMember(this);
+
             CurrentDiffProc.BecameAggregateTargetEvent += AggregateProcessAction;
             return CurrentDiffProc;
         }
+
         private void AggregateProcessAction(DiffusionProcess newOwner)
         {
             if(CurrentDiffProc!=null)

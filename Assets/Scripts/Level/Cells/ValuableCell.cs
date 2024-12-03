@@ -121,6 +121,7 @@ namespace Derevo.Level
                 TrySetDiffusionDirection(DiffusionDirection.CannotHaveDirections,cellPos.x, cellPos.y);
             }
         }
+        public bool IsUnfixed_ => Value == 0 || DiffDirection != 0;
 
         protected Vector2Int[] GetCellsFromDirection(DiffusionDirection direction, Vector2Int cellPos)
         {
@@ -237,6 +238,4 @@ namespace Derevo.Level
                     return 0;
             }
         }
-    }
-   
-}
+    }}

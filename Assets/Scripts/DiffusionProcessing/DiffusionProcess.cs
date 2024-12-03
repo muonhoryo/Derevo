@@ -25,7 +25,8 @@ namespace Derevo.DiffusionProcessing
 
         public void AddMember(DiffusionCell member)
         {
-            Members.Add(member);
+            if(!Members.Contains(member))
+                Members.Add(member);
         }
         public void Diffuse()
         {
@@ -65,6 +66,12 @@ namespace Derevo.DiffusionProcessing
         {
             Members.AddRange(otherProcess.Members);
             otherProcess.BecameAggregateTarget(this);
+        }
+        public DiffusionCell[] GetMembers()
+        {
+            var cells=new DiffusionCell[Members.Count];
+            Members.CopyTo(cells);
+            return cells;
         }
 
         private void BecameAggregateTarget(DiffusionProcess aggregateOwner)

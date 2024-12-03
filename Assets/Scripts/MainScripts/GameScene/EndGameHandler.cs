@@ -25,6 +25,10 @@ namespace Derevo
                 else
                     Lose();
             }
+            else if(!LevelManager.HasUnfixedCells())
+            {
+                Lose();
+            }
         }
         private bool CalculatePlayerState()
         {

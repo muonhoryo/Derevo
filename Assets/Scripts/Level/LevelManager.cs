@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Derevo.Level
 {
@@ -113,7 +114,8 @@ namespace Derevo.Level
                         if (parCell.HasConnection(pos))
                         {
                             var process = DiffusionProcessing.DiffusionProcessing.LastStartedProcessInfo_.DiffusionMap[i][j].GetDiffusionProcess(i, j);
-                            if (process != null)
+                            if (process != null&&
+                                !procs.Contains(process))
                             {
                                 SubscribeOnAggEvent(process);
                                 procs.Add(process);
@@ -229,6 +231,21 @@ namespace Derevo.Level
             }
             DiffusionParticlesManager.Initialize(info.ParticlesCount);
             InitializeMapEvent();
+        }
+        public static bool HasUnfixedCells()
+        {
+            foreach(var column in LevelMap)
+            {
+                foreach(var cell in column)
+                {
+                    if(cell is ValuableCell vlCell &&
+                        vlCell.IsUnfixed_)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         public static bool CheckCellPos(int column,int row)
