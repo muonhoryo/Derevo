@@ -46,7 +46,7 @@ namespace Derevo.UI
         }
         void IPointerUpHandler.OnPointerUp(PointerEventData eventData)
         {
-            if (IsActive_)
+            if (IsActive_ && IsInsidePointer_)
             {
                 IsPressed_ = false;
                 OnPointerUpEvent();

@@ -16,6 +16,7 @@ namespace Derevo.UI
         {
             TargetButton.OnPointerEnterEvent += OnPointerEnter;
             TargetButton.OnPointerExitEvent += OnPointerExit;
+            TargetButton.DeactivationEvent += OnPointerExit;
             OnPointerExit();
         }
         private void OnPointerExit()
