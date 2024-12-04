@@ -4,16 +4,10 @@ using UnityEngine;
 
 namespace Derevo.UI.Scripts
 {
-    public sealed class BtnScript_ChangeUILayer : MonoBehaviour
+    public sealed class BtnScript_ChangeUILayer : BtnScript
     {
-        [SerializeField] private UIButton Owner;
         [SerializeField] private UILayer SelectLayer;
-
-        private void Awake()
-        {
-            Owner.OnPointerDownEvent += OnPointerDown;
-        }
-        private void OnPointerDown()
+        protected override void OnPointerDown()
         {
             SelectLayer.SelectThis();
         }
