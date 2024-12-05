@@ -10,5 +10,8 @@ namespace Derevo
     {
         [Range(0,100)]
         public float DiffusionProcessTime;
+
+        [Range(0, 100)]
+        public float LevelTransitionDelay;
     }
 }
