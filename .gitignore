@@ -14,3 +14,6 @@ Derevo.sln
 *.meta
 /Assets/Scripts/Editor
 /Assets/Prefabs
+/Assets/Audio
+/Assets/Libraries
+Assets/Main.mixer
