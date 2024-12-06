@@ -7,11 +7,8 @@ using UnityEngine.SceneManagement;
 
 namespace Derevo.UI.Scripts
 {
-    public sealed class BtnScript_DelayedLevelTransition : BtnScript
+    public sealed class BtnScript_DelayedLevelTransition : BtnScript_LevelTransition
     {
-        [SerializeField] private string GameSceneName;
-        [SerializeField] private string LevelName;
-
         protected override void OnPointerDown()
         {
             StartCoroutine(DelayedTransition());
@@ -19,8 +16,7 @@ namespace Derevo.UI.Scripts
         private IEnumerator DelayedTransition()
         {
             yield return new WaitForSeconds(GlobalConstsHandler.Instance_.LevelTransitionDelay);
-            GameSceneLevelInitialization.LevelName = LevelName;
-            SceneManager.LoadScene(GameSceneName);
+            TransitionAction();
         }
     }
 }

@@ -10,19 +10,19 @@ namespace Derevo.UI
         [SerializeField] private Image TargetSprite;
         [SerializeField] private UIButton TargetButton;
         [SerializeField] private Sprite NormalSprite;
-        [SerializeField] private Sprite PressedSprite;
+        [SerializeField] private Sprite InactiveSprite;
 
         private void Awake()
         {
-            TargetButton.OnPointerDownEvent += OnPointerDown;
-            TargetButton.OnPointerUpEvent += OnPointerUp;
-            OnPointerUp();
+            TargetButton.ActivationEvent += Activation;
+            TargetButton.DeactivationEvent+= Deactivation;
+            Activation();
         }
-        private void OnPointerDown()
+        private void Deactivation()
         {
-            TargetSprite.sprite = PressedSprite;
+            TargetSprite.sprite = InactiveSprite;
         }
-        private void OnPointerUp()
+        private void Activation()
         {
             TargetSprite.sprite = NormalSprite;
         }
