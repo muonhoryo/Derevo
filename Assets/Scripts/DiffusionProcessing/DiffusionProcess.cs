@@ -73,6 +73,54 @@ namespace Derevo.DiffusionProcessing
             Members.CopyTo(cells);
             return cells;
         }
+        public Vector2[] GetDiffusionPath(Vector2Int origin,Vector2Int destination)
+        {
+            if (origin == destination)
+                throw new ArgumentException("Origin cannot be equal destinanation.");
+
+            int originIndex=-1;
+            int destinationIndex=-1;
+            Vector2[] path;
+            for(int i = 0; i < Members.Count; i++)
+            {
+                if (Members[i].CellPosition_ == origin)
+                {
+                    originIndex = i;
+                    break;
+                }
+            }
+            for(int i = 0; i < Members.Count; i++)
+            {
+                if (Members[i].CellPosition_==destination)
+                {
+                    destinationIndex = i;
+                    break;
+                }
+            }
+
+            if (originIndex == -1)
+                throw new ArgumentException("Cannot find cell with position: " + origin);
+            if (destinationIndex == -1)
+                throw new ArgumentException("Cannot find cell with position: " + destination);
+
+            if (destinationIndex > originIndex)
+            {
+                path = new Vector2[destinationIndex - originIndex];
+                for(int i = originIndex,j=0; j < path.Length; i++,j++)
+                {
+                    path[j] = Members[i].CellPosition_;
+                }
+            }
+            else
+            {
+                path = new Vector2[originIndex - destinationIndex];
+                for (int i = destinationIndex, j = 0; j < path.Length; i++, j++)
+                {
+                    path[j] = Members[i].CellPosition_;
+                }
+            }
+            return path;
+        }
 
         private void BecameAggregateTarget(DiffusionProcess aggregateOwner)
         {
