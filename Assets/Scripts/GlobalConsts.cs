@@ -13,5 +13,6 @@ namespace Derevo
 
         [Range(0, 100)]
         public float LevelTransitionDelay;
+        public Vector2 CellsUploadPositionOffset;
     }
 }

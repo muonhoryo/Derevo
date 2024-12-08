@@ -247,6 +247,12 @@ namespace Derevo.Level
             }
             return false;
         }
+        public static int GetColumnLength(int column)
+        {
+            if (column < 0 || column >= Width_)
+                return -1;
+            return LevelMap[column].Length;
+        }
 
         public static bool CheckCellPos(int column,int row)
         {

@@ -6,7 +6,7 @@ using UnityEngine;
 using MuonhoryoLibrary.Collections;
 using System.Collections.Generic;
 using System;
-using static UnityEngine.UI.Image;
+using System.Linq;
 
 namespace Derevo.Visual
 {
@@ -92,9 +92,20 @@ namespace Derevo.Visual
                 }
                 return hasNotMovable;
             }
+            public readonly int GetMovedParticlesCount()
+            {
+                int count = 0;
+                foreach(var par in Particles)
+                {
+                    if(par.CurrentTargetIndex>Path.Length) 
+                        count++;
+                }
+                return count;
+            }
         }
 
-        private readonly SingleLinkedList<ParticlesMoving> MovingList = new SingleLinkedList<ParticlesMoving> { }; 
+        private readonly SingleLinkedList<ParticlesMoving> MovingList = new SingleLinkedList<ParticlesMoving> { };
+        [SerializeField] private GameObject ParticlesParent;
 
         public void MoveCell2Cell_NoSt(DiffusionProcess diffProc, ICellContainer origin, ICellContainer destination,
             float[] particlesSpeeds, int particlesCount)
@@ -113,6 +124,7 @@ namespace Derevo.Visual
                 throw new ArgumentNullException("Missing speeds");
 
             Vector2[] path= diffProc.GetDiffusionPath(origin.CellPosition_, destination.CellPosition_);
+            path=path.Concat(new Vector2[] { destination.UploadPosition_}).ToArray();
             DiffusionParticle[] particles= origin.ExtractParticles(particlesCount);
             ParticlesMoving info = new ParticlesMoving(particles, particlesSpeeds,path,destination,origin);
             InternalStartMove(info);
@@ -129,6 +141,41 @@ namespace Derevo.Visual
                 throw new ArgumentException("Particles count must be more than 0");
             if (particlesSpeeds == null || particlesSpeeds.Length != particlesCount)
                 throw new ArgumentNullException("Missing speeds");
+
+            while (true)
+            {
+                if (CheckInterruption(origin, out ParticlesMoving? interrProc))
+                {
+                    ParticlesMoving parIntProc = (ParticlesMoving)interrProc;
+                    int movedParCount = parIntProc.GetMovedParticlesCount();
+                    Func<ParticlesMoving.ParticleInfo, bool> filterFunc = (par) => par.CurrentTargetIndex <= parIntProc.Path.Length;
+                    Func<ParticlesMoving.ParticleInfo, DiffusionParticle> particlesSelectionFunc = (par) => par.Owner;
+                    Func<ParticlesMoving.ParticleInfo, float> speedsSelectionFunc = (par) => par.MovingSpeed;
+
+                    IEnumerable<ParticlesMoving.ParticleInfo> freeParticles= parIntProc.Particles.Where(filterFunc);
+                    IEnumerable<DiffusionParticle> freeParParticles = freeParticles.Select(particlesSelectionFunc);
+                    if (movedParCount >= particlesCount)
+                    {
+                        MoveDirectly_NoSt(freeParParticles.Take(particlesCount).ToArray(),destination, particlesSpeeds);
+                        if (movedParCount > particlesCount)
+                        {
+                            float[] newSpeeds = freeParticles.Select(speedsSelectionFunc).Skip(particlesCount).ToArray();
+
+                            MoveDirectly_NoSt(freeParParticles.Skip(particlesCount).ToArray(), destination, newSpeeds);
+                        }
+                        break;
+                    }
+                    else
+                    {
+                        MoveDirectly_NoSt(freeParParticles.ToArray(), destination, particlesSpeeds.Take(movedParCount).ToArray());
+                        particlesCount -= movedParCount;
+                        particlesSpeeds = particlesSpeeds.Skip(movedParCount).ToArray();
+                    }
+                    MovingList.Remove(parIntProc);
+                }
+                else
+                    break;
+            }
 
             Vector2[] path = new Vector2[]
             {
