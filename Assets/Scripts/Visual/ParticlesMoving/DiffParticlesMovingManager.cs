@@ -213,6 +213,10 @@ namespace Derevo.Visual
         private void InternalStartMove(ParticlesMoving info)
         {
             MovingList.AddLast(info);
+            foreach(var par in info.Particles)
+            {
+                par.Owner.TurnOffPhysic();
+            }
         }
 
         private void Awake()
