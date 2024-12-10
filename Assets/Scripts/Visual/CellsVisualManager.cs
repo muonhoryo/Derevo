@@ -23,8 +23,8 @@ namespace Derevo.UI
             return LevelMap[column][row];
         }
 
+        public static float PhysicContainersRowHeight;
 
-        [SerializeField] private GameObject DiffusionParticlePrefab;
         [SerializeField] private GameObject CellButtonPrefab;
         [SerializeField] private GameObject ButtonsParent;
         [SerializeField] private float PositionModifier;
@@ -40,6 +40,7 @@ namespace Derevo.UI
         }
         private void OnLoadingLevelAction()
         {
+            PhysicContainersRowHeight = GlobalConstsHandler.Instance_.ParticlesFixingRadius*Mathf.Sqrt(3);
             GenerateLevel();
         }
         public static void GenerateLevel()

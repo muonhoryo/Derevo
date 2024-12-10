@@ -19,8 +19,9 @@ namespace Derevo.Visual
 
         public static DiffusionParticle SpawnParticle(Vector2 position)
         {
-            return Instantiate(Instance.ParticlePrefab, position,
-                Quaternion.Euler(0, 0, 0),Instance.ParticlesParent).GetComponent<DiffusionParticle>();
+            DiffusionParticle particle= Instantiate(Instance.ParticlePrefab, Instance.ParticlesParent).GetComponent<DiffusionParticle>();
+            particle.transform.position = position;
+            return particle;
         }
         public static DiffusionParticle[] SpawnParticles(Vector2 position,int count)
         {

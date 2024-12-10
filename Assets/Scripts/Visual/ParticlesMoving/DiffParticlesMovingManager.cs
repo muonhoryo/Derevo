@@ -51,13 +51,28 @@ namespace Derevo.Visual
             public ParticlesMoving(DiffusionParticle[] particles,float[] particlesSpeeds, Vector2[] path, IParticlesContainer destination, IParticlesContainer origin)
             {
                 Particles = new ParticleInfo[particles.Length];
-                for(int i = 0; i < particles.Length; i++)
+                ClampSpeeds(particlesSpeeds,path);
+                for (int i = 0; i < particles.Length; i++)
                 {
                     Particles[i] = new ParticleInfo(particles[i], particlesSpeeds[i]);
                 }
                 Path = path;
                 Destination = destination;
                 Origin = origin;
+            }
+            private static void ClampSpeeds(float[] speeds,in Vector2[] path)
+            {
+                float pathLength = GlobalConstsHandler.Instance_.ParticlesAdditionalPathLength;
+                foreach(var point in path)
+                {
+                    pathLength += point.magnitude;
+                }
+                float minSpeed = pathLength / GlobalConstsHandler.Instance_.DiffusionProcessTime;
+                for(int i = 0; i < speeds.Length; i++)
+                {
+                    if (speeds[i] < minSpeed)
+                        speeds[i] = minSpeed;
+                }
             }
 
             /// <summary>
@@ -66,19 +81,19 @@ namespace Derevo.Visual
             /// <returns></returns>
             public readonly bool Move()
             {
-                Vector3 dir;
+                Vector2 dir;
                 ParticleInfo curInfo;
                 bool hasNotMovable = true;
                 for(int i = 0; i < Particles.Length; i++)
                 {
                     curInfo = Particles[i];
-                    if (curInfo.CurrentTargetIndex <= Path.Length)
+                    if (curInfo.CurrentTargetIndex < Path.Length)
                     {
                         hasNotMovable = false;
                         dir = Path[curInfo.CurrentTargetIndex] - (Vector2)curInfo.Owner.transform.position;
                         if (dir.magnitude <= curInfo.MovingSpeed)
                         {
-                            curInfo.Owner.transform.position = Path[curInfo.CurrentTargetIndex];
+                            curInfo.Owner.transform.position= Path[curInfo.CurrentTargetIndex];
                             curInfo.CurrentTargetIndex++;
                             if (curInfo.CurrentTargetIndex > Path.Length)
                                 Destination.UploadParticles(curInfo.Owner);
@@ -86,7 +101,7 @@ namespace Derevo.Visual
                         else
                         {
                             dir = dir.normalized;
-                            curInfo.Owner.transform.position += dir * curInfo.MovingSpeed;
+                            curInfo.Owner.transform.position+= (Vector3)(dir * curInfo.MovingSpeed);
                         }
                     }
                 }
@@ -104,8 +119,7 @@ namespace Derevo.Visual
             }
         }
 
-        private readonly SingleLinkedList<ParticlesMoving> MovingList = new SingleLinkedList<ParticlesMoving> { };
-        [SerializeField] private GameObject ParticlesParent;
+        private readonly List<ParticlesMoving> MovingList = new List<ParticlesMoving> { };
 
         public void MoveCell2Cell_NoSt(DiffusionProcess diffProc, ICellContainer origin, ICellContainer destination,
             float[] particlesSpeeds, int particlesCount)
@@ -212,7 +226,7 @@ namespace Derevo.Visual
         }
         private void InternalStartMove(ParticlesMoving info)
         {
-            MovingList.AddLast(info);
+            MovingList.Add(info);
             foreach(var par in info.Particles)
             {
                 par.Owner.TurnOffPhysic();
@@ -222,17 +236,17 @@ namespace Derevo.Visual
         private void Awake()
         {
             Instance = this;
-            enabled = false;
         }
         private void Update()
         {
-            if (MovingList.Count_ > 0)
+            if (MovingList.Count > 0)
             {
-                for(int i = 0; i < MovingList.Count_; i++)
+                for(int i = 0; i < MovingList.Count; i++)
                 {
                     if (MovingList[i].Move())
                     {
-                        MovingList.RemoveAtIndex(i);
+                        MovingList[i].Destination.UploadParticles(MovingList[i].Particles.Select((parInfo)=>parInfo.Owner).ToArray());
+                        MovingList.RemoveAt(i);
                         i--;
                     }
                 }

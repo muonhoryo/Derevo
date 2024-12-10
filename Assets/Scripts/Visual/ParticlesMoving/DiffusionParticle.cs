@@ -7,7 +7,14 @@ namespace Derevo.Visual
     public sealed class DiffusionParticle : MonoBehaviour
     {
         [SerializeField] private Rigidbody2D RGBody;
-        [SerializeField] private Collider Collision;
+        [SerializeField] private Collider2D Collision;
+
+        public RectTransform RectTransform;
+
+        private void Awake()
+        {
+            RectTransform = transform as RectTransform;
+        }
 
         public void AddForce(Vector2 force)
         {

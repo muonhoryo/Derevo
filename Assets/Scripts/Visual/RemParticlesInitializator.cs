@@ -8,8 +8,7 @@ namespace Derevo.Visual
 {
     public sealed class RemParticlesInitializator : MonoBehaviour 
     {
-        [SerializeField] private GameObject ParticlePrefab;
-        [SerializeField] private IParticlesContainer RemParticlesIndicator;
+        [SerializeField] private MonoBehaviour RemParticlesIndicator;
 
         private void Awake()
         {
@@ -17,10 +16,11 @@ namespace Derevo.Visual
         }
         private void LevelInitialization()
         {
-            LevelManager.InitializeMapEvent -= LevelInitialization;
-            DiffusionParticle[] particles = ParticlesSpawner.SpawnParticles(RemParticlesIndicator.UploadPosition_,
+            LevelManager.InitializeMapEvent -= LevelInitialization; 
+            IParticlesContainer indicator = RemParticlesIndicator as IParticlesContainer;
+            DiffusionParticle[] particles = ParticlesSpawner.SpawnParticles(indicator.UploadPosition_,
                 DiffusionParticlesManager.RemainedParticlesCount_);
-            DiffParticlesMovingManager.MoveDirectly(particles, RemParticlesIndicator, Enumerable.Repeat(float.MaxValue, particles.Length).ToArray());
+            DiffParticlesMovingManager.MoveDirectly(particles, indicator, Enumerable.Repeat(float.MaxValue, particles.Length).ToArray());
         }
     }
 }

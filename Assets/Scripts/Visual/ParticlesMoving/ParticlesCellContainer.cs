@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Derevo.Level;
 using Derevo.PlayerControl;
+using Derevo.UI;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -143,10 +144,10 @@ namespace Derevo.Visual
             Vector2 parGlobalPos = parInfo.Owner.transform.position;
             //Vector2 centerOffset = new Vector2(cellGlobalPos.x % particleRadius, cellGlobalPos.y % particleRadius);
             Vector2 parLocalPos = parGlobalPos - cellGlobalPos;
-            int row = Mathf.RoundToInt((parLocalPos.y-RowsStart) % (Mathf.Sqrt(3) * particleRadius));
+            int row = Mathf.RoundToInt((parLocalPos.y-RowsStart) /CellsVisualManager.PhysicContainersRowHeight);
             bool isOdd = row % 2 == 0;
-            int column = Mathf.RoundToInt((isOdd ? parLocalPos.x : parLocalPos.x - particleRadius) % (particleRadius * 2));
-            Vector2 parNewPos = new Vector2(column * particleRadius * 2, row * Mathf.Sqrt(3) * particleRadius);
+            int column = Mathf.RoundToInt((isOdd ? parLocalPos.x : parLocalPos.x - particleRadius) / (particleRadius * 2));
+            Vector2 parNewPos = new Vector2(column * particleRadius * 2, row * CellsVisualManager.PhysicContainersRowHeight);
             parInfo.Owner.transform.position = parNewPos;
             parInfo.Owner.TurnMovingOff();
             parInfo.IsActiveFermentation = false;
