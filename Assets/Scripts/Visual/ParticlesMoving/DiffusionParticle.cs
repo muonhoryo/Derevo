@@ -9,13 +9,6 @@ namespace Derevo.Visual
         [SerializeField] private Rigidbody2D RGBody;
         [SerializeField] private Collider2D Collision;
 
-        public RectTransform RectTransform;
-
-        private void Awake()
-        {
-            RectTransform = transform as RectTransform;
-        }
-
         public void AddForce(Vector2 force)
         {
             RGBody.AddForce(force, ForceMode2D.Force);
@@ -33,7 +26,7 @@ namespace Derevo.Visual
         public void TurnOffPhysic()
         {
             Collision.enabled = false;
-            RGBody.isKinematic =true;
+            TurnMovingOff();
         }
         /// <summary>
         /// Set particle as unmovable by physic
@@ -41,6 +34,8 @@ namespace Derevo.Visual
         public void TurnMovingOff()
         {
             RGBody.isKinematic = true;
+            RGBody.velocity = Vector2.zero;
+            RGBody.angularVelocity = 0;
         }
         /// <summary>
         /// Set particle as movable by physic

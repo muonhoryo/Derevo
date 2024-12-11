@@ -19,7 +19,7 @@ namespace Derevo.Visual
         private void LevelLoadingDone()
         {
             GameSceneLevelInitialization.LevelLoadingDoneEvent -= LevelLoadingDone;
-            DiffusionProcessing.DiffusionProcessing.EndDiffusionEvent += EndDiffusion;
+            DiffusionProcessing.DiffusionProcessing.StartDiffusionEvent += EndDiffusion;
         }
         private void EndDiffusion()
         {

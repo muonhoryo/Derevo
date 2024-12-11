@@ -2,6 +2,7 @@
 
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Derevo.Level;
@@ -38,6 +39,7 @@ namespace Derevo.Visual
                 PrevPos = Owner.transform.position;
                 if (step.magnitude <= GlobalConstsHandler.Instance_.ParticlesFermentationThreshold)
                 {
+                    IsActiveFermentation = false;
                     return true;
                 }
                 else
@@ -76,6 +78,8 @@ namespace Derevo.Visual
         public Vector2 ExtractPosition_ => transform.position;
 
         private float RowsStart;
+        private Coroutine UploadDelayCoroutine;
+        private Coroutine ParticlesStopHandlingCoroutine;
 
 
         public DiffusionParticle[] ExtractParticles(int extractedCount)
@@ -105,10 +109,12 @@ namespace Derevo.Visual
                 throw new ArgumentNullException("Missing particles array");
 
             foreach (var par in uploadedParticles)
+            {
                 par.TurnMovingOn();
+            }
             UploadedParticles.AddRange(uploadedParticles.Select(ParticlesSelectionFunc));
+            StartUploadDelayCoroutine();
         }
-
         public void UploadParticles(DiffusionParticle uploadedParticle)
         {
             if (uploadedParticle == null)
@@ -116,23 +122,45 @@ namespace Derevo.Visual
 
             uploadedParticle.TurnMovingOn();
             UploadedParticles.Add(new ParticlesFermentationProcess(uploadedParticle));
+            StartUploadDelayCoroutine();
+        }
+        private void StartUploadDelayCoroutine()
+        {
+            if (UploadDelayCoroutine != null)
+                StopCoroutine(UploadDelayCoroutine);
+            UploadDelayCoroutine = StartCoroutine(UploadDelay());
+        }
+        private IEnumerator UploadDelay()
+        {
+            if(ParticlesStopHandlingCoroutine!=null)
+                StopCoroutine(ParticlesStopHandlingCoroutine);
+            yield return new WaitForSeconds(GlobalConstsHandler.Instance_.ParticlesCellContainer_UploadDelay);
+            ParticlesStopHandlingCoroutine = StartCoroutine(ParticlesStopHandling());
         }
 
         public void Initialize(Vector2Int cellPosition)
         {
             CellPosition_ = cellPosition;
-            RowsStart = cellPosition.y - (Mathf.Sqrt(3) / 2) + GlobalConstsHandler.Instance_.ParticlesFixingRadius;
+            RowsStart = transform.position.y + GlobalConstsHandler.Instance_.ParticlesCellContainer_BottomOffset;
         }
 
-        private void Update()
+        private void Start()
         {
-            if (UploadedParticlesCount_ > 0)
+            ParticlesStopHandlingCoroutine= StartCoroutine(ParticlesStopHandling());
+        }
+        private IEnumerator ParticlesStopHandling()
+        {
+            while (true)
             {
-                foreach (var parInfo in UploadedParticles)
+                yield return new WaitForSeconds(GlobalConstsHandler.Instance_.ParticlesContainers_StopHandlingTime);
+                if (UploadedParticlesCount_ > 0)
                 {
-                    if (parInfo.IsActiveFermentation && parInfo.CheckFermentationDone())
+                    foreach (var parInfo in UploadedParticles)
                     {
-                        FixParticle(parInfo);
+                        if (parInfo.IsActiveFermentation && parInfo.CheckFermentationDone())
+                        {
+                            FixParticle(parInfo);
+                        }
                     }
                 }
             }
@@ -140,14 +168,13 @@ namespace Derevo.Visual
         private void FixParticle(ParticlesFermentationProcess parInfo)
         {
             float particleRadius = GlobalConstsHandler.Instance_.ParticlesFixingRadius;
-            Vector2 cellGlobalPos = transform.position;
             Vector2 parGlobalPos = parInfo.Owner.transform.position;
-            //Vector2 centerOffset = new Vector2(cellGlobalPos.x % particleRadius, cellGlobalPos.y % particleRadius);
-            Vector2 parLocalPos = parGlobalPos - cellGlobalPos;
-            int row = Mathf.RoundToInt((parLocalPos.y-RowsStart) /CellsVisualManager.PhysicContainersRowHeight);
+            int row;
+            int column;
+            row = Mathf.RoundToInt((parGlobalPos.y-RowsStart) / CellsVisualManager.PhysicContainersRowHeight);
             bool isOdd = row % 2 == 0;
-            int column = Mathf.RoundToInt((isOdd ? parLocalPos.x : parLocalPos.x - particleRadius) / (particleRadius * 2));
-            Vector2 parNewPos = new Vector2(column * particleRadius * 2, row * CellsVisualManager.PhysicContainersRowHeight);
+            column = Mathf.RoundToInt((isOdd ? parGlobalPos.x : parGlobalPos.x - particleRadius) / (particleRadius * 2));
+            Vector2 parNewPos = new Vector2(isOdd?column * particleRadius * 2:column*particleRadius*2-particleRadius, row * CellsVisualManager.PhysicContainersRowHeight+RowsStart);
             parInfo.Owner.transform.position = parNewPos;
             parInfo.Owner.TurnMovingOff();
             parInfo.IsActiveFermentation = false;

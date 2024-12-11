@@ -10,7 +10,6 @@ namespace Derevo
     {
         [Range(0,100)]
         public float DiffusionProcessTime;
-
         [Range(0, 100)]
         public float LevelTransitionDelay;
         [Range(0,10)]
@@ -26,11 +25,18 @@ namespace Derevo
         [Range(0,100)]
         public float RemParticlesVisualIndicator_MaxForce;
         [Range(0,10)]
+        public float ParticlesCellContainer_UploadDelay;
+        public float ParticlesCellContainer_BottomOffset;
+        [Range(0,10)]
         public float ParticlesDiffusionSpeedMin;
         [Range(0,10)]
         public float ParticlesDiffusionSpeedDispersion;
         [Range(0,10)]
         public float ParticlesAdditionalPathLength;
+        [Range(0,10)]
+        public float ParticlesSpawner_PositionDispersion;
+        [Range(0,10)]
+        public float ParticlesContainers_StopHandlingTime;
         public Vector2 CellsUploadPositionOffset;
     }
 }
