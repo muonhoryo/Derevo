@@ -7,11 +7,14 @@ using UnityEngine;
 using Derevo.DiffusionProcessing;
 using System.Collections.Generic;
 using Derevo.UI;
+using System.Linq;
 
 namespace Derevo.Visual
 {
     public sealed class DiffusionVisualizationManager : MonoBehaviour
     {
+        [SerializeField] private RemParticlesVisualIndicator RemParticlesVisualIndicator;
+
         private void Awake()
         {
             GameSceneLevelInitialization.LevelLoadingDoneEvent+= LevelLoadingDone;
@@ -20,7 +23,9 @@ namespace Derevo.Visual
         {
             GameSceneLevelInitialization.LevelLoadingDoneEvent -= LevelLoadingDone;
             DiffusionProcessing.DiffusionProcessing.StartDiffusionEvent += EndDiffusion;
+            LevelManager.ChangeCellValueEvent += ChangeValueCell;
         }
+
         private void EndDiffusion()
         {
             foreach(var difProc in DiffusionProcessing.DiffusionProcessing.LastStartedProcessInfo_.HandledProcceses)
@@ -113,6 +118,28 @@ namespace Derevo.Visual
                     }
                 }
             }
+        }
+        private void ChangeValueCell(LevelManager.ChangeCellValueEventInfo info)
+        {
+            int diff;
+            IParticlesContainer cell= CellsVisualManager.GetCell(info.Column, info.Row).GetComponent<IParticlesContainer>();
+            IParticlesContainer origin;
+            IParticlesContainer destination;
+            float speed = GlobalConstsHandler.Instance_.ParticlesDiffusionSpeedMin + GlobalConstsHandler.Instance_.ParticlesDiffusionSpeedDispersion;
+            if (info.NewValue < info.OldValue)
+            {
+                diff = info.OldValue - info.NewValue;
+                origin = cell;
+                destination = RemParticlesVisualIndicator;
+            }
+            else
+            {
+                diff = info.NewValue - info.OldValue;
+                origin = RemParticlesVisualIndicator;
+                destination = cell;
+            }
+            float[] speeds=Enumerable.Repeat(speed, diff).ToArray();
+            DiffParticlesMovingManager.MoveDirectly(origin,destination,speeds, diff); 
         }
     }
 }

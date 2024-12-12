@@ -106,7 +106,7 @@ namespace Derevo.Visual
         public void UploadParticles(DiffusionParticle[] uploadedParticles)
         {
             if (uploadedParticles == null || uploadedParticles.Length == 0)
-                throw new ArgumentNullException("Missing particles array");
+                throw new ArgumentNullException("Particles array");
 
             foreach (var par in uploadedParticles)
             {

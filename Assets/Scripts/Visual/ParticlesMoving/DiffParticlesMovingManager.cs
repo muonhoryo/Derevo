@@ -63,12 +63,19 @@ namespace Derevo.Visual
             private static void ClampSpeeds(float[] speeds,in Vector2[] path)
             {
                 float pathLength = GlobalConstsHandler.Instance_.ParticlesAdditionalPathLength;
-                foreach(var point in path)
+                if (path.Length > 1)
                 {
-                    pathLength += point.magnitude;
+                    Vector2 prev = path[0];
+                    Vector2 diff;
+                    for (int i = 1; i < speeds.Length; i++)
+                    {
+                        diff = path[i] - prev;
+                        pathLength += diff.magnitude;
+                        prev = path[i];
+                    }
                 }
                 float minSpeed = pathLength / GlobalConstsHandler.Instance_.DiffusionProcessTime;
-                for(int i = 0; i < speeds.Length; i++)
+                for (int i = 0; i < speeds.Length; i++)
                 {
                     if (speeds[i] < minSpeed)
                         speeds[i] = minSpeed;
@@ -106,16 +113,6 @@ namespace Derevo.Visual
                     }
                 }
                 return hasNotMovable;
-            }
-            public readonly int GetMovedParticlesCount()
-            {
-                int count = 0;
-                foreach(var par in Particles)
-                {
-                    if(par.CurrentTargetIndex>Path.Length) 
-                        count++;
-                }
-                return count;
             }
         }
 
@@ -161,31 +158,43 @@ namespace Derevo.Visual
                 if (CheckInterruption(origin, out ParticlesMoving? interrProc))
                 {
                     ParticlesMoving parIntProc = (ParticlesMoving)interrProc;
-                    int movedParCount = parIntProc.GetMovedParticlesCount();
-                    Func<ParticlesMoving.ParticleInfo, bool> filterFunc = (par) => par.CurrentTargetIndex <= parIntProc.Path.Length;
+
                     Func<ParticlesMoving.ParticleInfo, DiffusionParticle> particlesSelectionFunc = (par) => par.Owner;
                     Func<ParticlesMoving.ParticleInfo, float> speedsSelectionFunc = (par) => par.MovingSpeed;
 
-                    IEnumerable<ParticlesMoving.ParticleInfo> freeParticles= parIntProc.Particles.Where(filterFunc);
-                    IEnumerable<DiffusionParticle> freeParParticles = freeParticles.Select(particlesSelectionFunc);
-                    if (movedParCount >= particlesCount)
+                    List<float> freeParticlesSpeeds = new List<float> ();
+                    List<ParticlesMoving.ParticleInfo> freeParticlesList = new List<ParticlesMoving.ParticleInfo>();
+                    List<ParticlesMoving.ParticleInfo> uploadedParticlesList = new List<ParticlesMoving.ParticleInfo>();
+                    for(int i = 0; i < parIntProc.Particles.Length; i++)
                     {
-                        MoveDirectly_NoSt(freeParParticles.Take(particlesCount).ToArray(),destination, particlesSpeeds);
-                        if (movedParCount > particlesCount)
+                        if (parIntProc.Particles[i].CurrentTargetIndex <= parIntProc.Path.Length)
                         {
-                            float[] newSpeeds = freeParticles.Select(speedsSelectionFunc).Skip(particlesCount).ToArray();
-
-                            MoveDirectly_NoSt(freeParParticles.Skip(particlesCount).ToArray(), destination, newSpeeds);
+                            freeParticlesList.Add(parIntProc.Particles[i]);
+                            freeParticlesSpeeds.Add(parIntProc.Particles[i].MovingSpeed);
                         }
-                        break;
+                        else
+                        {
+                            uploadedParticlesList.Add(parIntProc.Particles[i]);
+                        }
+                    }
+                    MovingList.Remove(parIntProc);
+                    if (freeParticlesList.Count > particlesCount)
+                    {
+                        MoveDirectly_NoSt(freeParticlesList.Take(particlesCount).Select(particlesSelectionFunc).ToArray(), destination, particlesSpeeds);
+                        MoveDirectly_NoSt(freeParticlesList.Skip(particlesCount).Select(particlesSelectionFunc).ToArray(), origin, freeParticlesSpeeds.Skip(particlesCount).ToArray());
+                        return;
+                    }
+                    else if (freeParticlesList.Count == particlesCount)
+                    {
+                        MoveDirectly_NoSt(freeParticlesList.Select(particlesSelectionFunc).ToArray(), destination, particlesSpeeds);
+                        return;
                     }
                     else
                     {
-                        MoveDirectly_NoSt(freeParParticles.ToArray(), destination, particlesSpeeds.Take(movedParCount).ToArray());
-                        particlesCount -= movedParCount;
-                        particlesSpeeds = particlesSpeeds.Skip(movedParCount).ToArray();
+                        int diff= particlesCount - freeParticlesList.Count;
+                        MoveDirectly_NoSt(freeParticlesList.Select(particlesSelectionFunc).ToArray(), destination, particlesSpeeds.Take(freeParticlesList.Count).ToArray());
+                        particlesCount = diff;
                     }
-                    MovingList.Remove(parIntProc);
                 }
                 else
                     break;
