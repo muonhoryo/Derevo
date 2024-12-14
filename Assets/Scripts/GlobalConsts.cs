@@ -26,6 +26,7 @@ namespace Derevo
         public float RemParticlesVisualIndicator_MaxForce;
         [Range(0,10)]
         public float ParticlesCellContainer_UploadDelay;
+        [SerializeField]
         public float ParticlesCellContainer_BottomOffset;
         [Range(0,10)]
         public float ParticlesDiffusionSpeedMin;
@@ -33,8 +34,8 @@ namespace Derevo
         public float ParticlesDiffusionSpeedDispersion;
         [Range(0,10)]
         public float ParticlesAdditionalPathLength;
-        [Range(0,10)]
-        public float ParticlesSpawner_PositionDispersion;
+        [Range(0, 10)]
+        public float ParticleCellContainer_UploadXPosDispersion;
         [Range(0,10)]
         public float ParticlesContainers_StopHandlingTime;
         public Vector2 CellsUploadPositionOffset;

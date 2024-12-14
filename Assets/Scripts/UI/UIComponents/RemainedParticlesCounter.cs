@@ -4,7 +4,7 @@ using Derevo.Level;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Derevo.GUI
+namespace Derevo.UI
 {
     public sealed class RemainedParticlesCounter : MonoBehaviour
     {

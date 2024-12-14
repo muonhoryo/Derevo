@@ -149,6 +149,10 @@ namespace Derevo.Visual
 
         public void UploadParticles(DiffusionParticle[] uploadedParticles)
         {
+            foreach(var p in uploadedParticles)
+            {
+                DisperseParticle(p);
+            }
             FreeParticles(uploadedParticles);
             StopCoroutine(HighestRowCalculationCoroutine);
             StartCoroutine(HighestRowCalculation());
@@ -156,9 +160,19 @@ namespace Derevo.Visual
 
         public void UploadParticles(DiffusionParticle uploadedParticle)
         {
+            DisperseParticle(uploadedParticle);
             FreeParticle(uploadedParticle);
             StopCoroutine(HighestRowCalculationCoroutine);
             StartCoroutine(HighestRowCalculation());
+        }
+        private void DisperseParticle(DiffusionParticle particle)
+        {
+            float min = -GlobalConstsHandler.Instance_.ParticleCellContainer_UploadXPosDispersion;
+            float max = GlobalConstsHandler.Instance_.ParticleCellContainer_UploadXPosDispersion;
+            particle.transform.position = new Vector3(
+                particle.transform.position.x + Random.Range(min, max),
+                particle.transform.position.y,
+                particle.transform.position.z);
         }
 
         private void Awake()

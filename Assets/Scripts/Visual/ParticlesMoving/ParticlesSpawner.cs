@@ -26,12 +26,9 @@ namespace Derevo.Visual
         public static DiffusionParticle[] SpawnParticles(Vector2 position,int count)
         {
             DiffusionParticle[] result=new DiffusionParticle[count];
-            float maxDisp = GlobalConstsHandler.Instance_.ParticlesSpawner_PositionDispersion;
-            float minDisp = -maxDisp;
             for (int i=0;i<count;i++)
             {
-                Vector2 offset = new Vector2(Random.Range(minDisp, maxDisp), Random.Range(minDisp, maxDisp));
-                result[i]=SpawnParticle(position+offset);
+                result[i]=SpawnParticle(position);
             }
             return result;
         }

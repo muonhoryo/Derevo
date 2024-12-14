@@ -15,6 +15,11 @@ namespace Derevo.UI
             DiffParticlesMovingManager.ActivateParticlesMoving += ActivateMoving;
             DiffParticlesMovingManager.DeactivateParticlesMoving += DeactivateMoving;
         }
+        private void OnDestroy()
+        {
+            DiffParticlesMovingManager.ActivateParticlesMoving -= ActivateMoving;
+            DiffParticlesMovingManager.DeactivateParticlesMoving-= DeactivateMoving;
+        }
         private void ActivateMoving()
         {
             Owner.Deactivate();

@@ -5,10 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Derevo.Level;
-using Derevo.PlayerControl;
 using Derevo.UI;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Derevo.Visual
@@ -110,6 +107,7 @@ namespace Derevo.Visual
 
             foreach (var par in uploadedParticles)
             {
+                DisperseParticle(par);
                 par.TurnMovingOn();
             }
             UploadedParticles.AddRange(uploadedParticles.Select(ParticlesSelectionFunc));
@@ -120,9 +118,19 @@ namespace Derevo.Visual
             if (uploadedParticle == null)
                 throw new ArgumentNullException("Missing particle");
 
+            DisperseParticle(uploadedParticle);
             uploadedParticle.TurnMovingOn();
             UploadedParticles.Add(new ParticlesFermentationProcess(uploadedParticle));
             StartUploadDelayCoroutine();
+        }
+        private void DisperseParticle(DiffusionParticle particle)
+        {
+            float min = -GlobalConstsHandler.Instance_.ParticleCellContainer_UploadXPosDispersion;
+            float max = GlobalConstsHandler.Instance_.ParticleCellContainer_UploadXPosDispersion;
+            particle.transform.position = new Vector3(
+                particle.transform.position.x + UnityEngine.Random.Range(min, max),
+                particle.transform.position.y,
+                particle.transform.position.z);
         }
         private void StartUploadDelayCoroutine()
         {
