@@ -13,9 +13,9 @@ namespace Derevo.UI
     {
         private static CellsVisualManager Instance;
 
-        private static UnfixedCell[][] LevelMap;
+        private static GameObject[][] LevelMap;
 
-        public static UnfixedCell GetCell(int column,int row)
+        public static GameObject GetCell(int column,int row)
         {
             if (column < 0 || column >= LevelMap.Length || row >= LevelMap[column].Length)
                 return null;
@@ -48,10 +48,10 @@ namespace Derevo.UI
             if (LevelManager.Width_ <= 0)
                 throw new System.Exception("Level is not initialized");
 
-            LevelMap = new UnfixedCell[LevelManager.Width_][];
+            LevelMap = new GameObject[LevelManager.Width_][];
             for (int i = 0; i < LevelMap.Length; i++)
             {
-                LevelMap[i] = new UnfixedCell[LevelManager.GetColumnLength(i)];
+                LevelMap[i] = new GameObject[LevelManager.GetColumnLength(i)];
             }
             LevelCell cell;
             for (int i = 0; i < LevelMap.Length; i++)
@@ -64,7 +64,7 @@ namespace Derevo.UI
                 }
             }
         }
-        private static UnfixedCell InstantiateLevelButton(LevelCell cell, Vector2Int cellPos)
+        private static GameObject InstantiateLevelButton(LevelCell cell, Vector2Int cellPos)
         {
             var button = Instantiate(Instance.CellButtonPrefab, Instance.ButtonsParent.transform);
             bool needOffset = LevelManager.IsFirstCellBottom_ == (cellPos.x % 2 == 1);
@@ -75,7 +75,6 @@ namespace Derevo.UI
                 Destroy(button.GetComponent<CellDirectionShower>());
                 Destroy(button.GetComponent<CellParticleCounter>());
                 Destroy(button.GetComponent<ParticlesCellContainer>());
-                return null;
             }
             else if (cell is ValuableCell parCell)
             {
@@ -98,10 +97,11 @@ namespace Derevo.UI
                 {
                     unfxdCell.Initialize(cellPos);
                 }
-                return unfxdCell;
             }
             else
                 throw new System.Exception("Unknown type of cell: " + cell.GetType().ToString());
+
+            return button;
         }
     }
 }

@@ -7,11 +7,15 @@ using MuonhoryoLibrary.Collections;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using System.Text;
 
 namespace Derevo.Visual
 {
     public sealed class DiffParticlesMovingManager : MonoBehaviour
     {
+        public static event Action ActivateParticlesMoving = delegate { };
+        public static event Action DeactivateParticlesMoving = delegate { };
+
         private static DiffParticlesMovingManager Instance;
 
         public static void MoveCell2Cell(DiffusionProcess diffProc, ICellContainer origin, ICellContainer destination,
@@ -67,14 +71,14 @@ namespace Derevo.Visual
                 {
                     Vector2 prev = path[0];
                     Vector2 diff;
-                    for (int i = 1; i < speeds.Length; i++)
+                    for (int i = 1; i < path.Length; i++)
                     {
                         diff = path[i] - prev;
                         pathLength += diff.magnitude;
                         prev = path[i];
                     }
                 }
-                float minSpeed = pathLength / GlobalConstsHandler.Instance_.DiffusionProcessTime;
+                float minSpeed = pathLength * Time.fixedDeltaTime / GlobalConstsHandler.Instance_.DiffusionProcessTime;
                 for (int i = 0; i < speeds.Length; i++)
                 {
                     if (speeds[i] < minSpeed)
@@ -240,13 +244,17 @@ namespace Derevo.Visual
             {
                 par.Owner.TurnOffPhysic();
             }
+            if (MovingList.Count == 1)
+            {
+                ActivateParticlesMoving();
+            }
         }
 
         private void Awake()
         {
             Instance = this;
         }
-        private void Update()
+        private void FixedUpdate()
         {
             if (MovingList.Count > 0)
             {
@@ -257,6 +265,10 @@ namespace Derevo.Visual
                         MovingList[i].Destination.UploadParticles(MovingList[i].Particles.Select((parInfo)=>parInfo.Owner).ToArray());
                         MovingList.RemoveAt(i);
                         i--;
+                        if (MovingList.Count == 0)
+                        {
+                            DeactivateParticlesMoving();
+                        }
                     }
                 }
             }

@@ -37,7 +37,8 @@ namespace Derevo.DiffusionProcessing
             if (IsInProcess_)
                 return;
 
-            LastStartedProcessInfo_=new DiffusionProcessInfo();
+            IsInProcess_ = true;
+            LastStartedProcessInfo_ =new DiffusionProcessInfo();
             LastStartedProcessInfo_.PreDiffMap= LevelManager.GetValueMap();
             LastStartedProcessInfo_.DiffusionMap = LevelManager.GetDiffusionMap();
             LastStartedProcessInfo_.HandledProcceses = LevelManager.InitializeDiffusionProcesses();
@@ -45,7 +46,6 @@ namespace Derevo.DiffusionProcessing
                 proc.Diffuse();
             LevelManager.ResetValuableCellsDirections();
             LastStartedProcessInfo_.PostDiffMap = LevelManager.GetValueMap();
-            IsInProcess_ = true;
             StartDiffusionEvent();
             CoroutinesHandler.Instance_.StartCoroutine(EndDiffusionDelay());
         }

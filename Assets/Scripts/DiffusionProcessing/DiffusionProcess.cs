@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Derevo.Level;
+using Derevo.UI;
+using Derevo.Visual;
 
 namespace Derevo.DiffusionProcessing 
 {
@@ -108,15 +110,17 @@ namespace Derevo.DiffusionProcessing
                 path = new Vector2[destinationIndex - originIndex];
                 for(int i = originIndex,j=0; j < path.Length; i++,j++)
                 {
-                    path[j] = Members[i].CellPosition_;
+                    Vector2Int cellPos = Members[i].CellPosition_;
+                    path[j] =CellsVisualManager.GetCell(cellPos.x,cellPos.y).GetComponent<IParticlesContainer>().ExtractPosition_;
                 }
             }
             else
             {
                 path = new Vector2[originIndex - destinationIndex];
-                for (int i = destinationIndex, j = 0; j < path.Length; i++, j++)
+                for (int i = originIndex, j = 0; j < path.Length; i--, j++)
                 {
-                    path[j] = Members[i].CellPosition_;
+                    Vector2Int cellPos = Members[i].CellPosition_;
+                    path[j] = CellsVisualManager.GetCell(cellPos.x, cellPos.y).GetComponent<IParticlesContainer>().ExtractPosition_;
                 }
             }
             return path;
