@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 
 namespace Derevo.UI
 {
-    public abstract class RadialSelector<T> : MonoBehaviour, IPointerClickHandler
+    public sealed class RadialSelector : MonoBehaviour, IPointerClickHandler
     {
         public void OnPointerClick(PointerEventData eventData)
         {

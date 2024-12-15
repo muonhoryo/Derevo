@@ -38,6 +38,8 @@ namespace Derevo
         public float ParticleCellContainer_UploadXPosDispersion;
         [Range(0,10)]
         public float ParticlesContainers_StopHandlingTime;
+        [Range(0.001f,10)]
+        public float ParticlesChanging_MinDelay;
         public Vector2 CellsUploadPositionOffset;
     }
 }
