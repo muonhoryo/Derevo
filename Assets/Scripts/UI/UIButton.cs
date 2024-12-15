@@ -1,12 +1,13 @@
 
 
 using System;
+using Derevo.PlayerControl;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace Derevo.UI
 {
-    public class UIButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
+    public class UIButton : PlayerControlElement, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
     {
         public event Action OnPointerDownEvent = delegate { };
         public event Action OnPointerUpEvent = delegate { };
@@ -67,6 +68,16 @@ namespace Derevo.UI
                 IsInsidePointer_ = false;
                 OnPointerExitEvent();
             }
+        }
+
+        protected override void LockAction()
+        {
+            IsActive_ = false;
+        }
+
+        protected override void UnlockAction()
+        {
+            IsActive_ = false;
         }
     }
 }

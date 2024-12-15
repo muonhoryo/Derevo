@@ -12,13 +12,13 @@ namespace Derevo.UI
 
         private void Awake()
         {
-            DiffParticlesMovingManager.ActivateParticlesMoving += ActivateMoving;
-            DiffParticlesMovingManager.DeactivateParticlesMoving += DeactivateMoving;
+            DiffParticlesMovingManager.ActivateParticlesMovingEvent += ActivateMoving;
+            DiffParticlesMovingManager.DeactivateParticlesMovingEvent += DeactivateMoving;
         }
         private void OnDestroy()
         {
-            DiffParticlesMovingManager.ActivateParticlesMoving -= ActivateMoving;
-            DiffParticlesMovingManager.DeactivateParticlesMoving-= DeactivateMoving;
+            DiffParticlesMovingManager.ActivateParticlesMovingEvent -= ActivateMoving;
+            DiffParticlesMovingManager.DeactivateParticlesMovingEvent-= DeactivateMoving;
         }
         private void ActivateMoving()
         {

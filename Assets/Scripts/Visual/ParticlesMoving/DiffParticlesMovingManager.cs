@@ -13,8 +13,8 @@ namespace Derevo.Visual
 {
     public sealed class DiffParticlesMovingManager : MonoBehaviour
     {
-        public static event Action ActivateParticlesMoving = delegate { };
-        public static event Action DeactivateParticlesMoving = delegate { };
+        public static event Action ActivateParticlesMovingEvent = delegate { };
+        public static event Action DeactivateParticlesMovingEvent = delegate { };
 
         private static DiffParticlesMovingManager Instance;
 
@@ -246,7 +246,7 @@ namespace Derevo.Visual
             }
             if (MovingList.Count == 1)
             {
-                ActivateParticlesMoving();
+                ActivateParticlesMovingEvent();
             }
         }
 
@@ -267,7 +267,7 @@ namespace Derevo.Visual
                         i--;
                         if (MovingList.Count == 0)
                         {
-                            DeactivateParticlesMoving();
+                            DeactivateParticlesMovingEvent();
                         }
                     }
                 }

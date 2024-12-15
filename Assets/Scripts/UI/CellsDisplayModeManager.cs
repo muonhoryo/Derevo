@@ -6,8 +6,8 @@ namespace Derevo.UI
 {
     public static class CellsDisplayModeManager
     {
-        public static Action ActivateDigitalDisplayModeEvent = delegate { };
-        public static Action DeactivateDigitalDisplayModeEvent = delegate { };
+        public static event Action ActivateDigitalDisplayModeEvent = delegate { };
+        public static event Action DeactivateDigitalDisplayModeEvent = delegate { };
 
         public static bool IsDigitalDisplayMode_ { get; private set; } = false;
 
