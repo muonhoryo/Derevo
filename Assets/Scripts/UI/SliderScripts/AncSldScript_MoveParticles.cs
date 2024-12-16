@@ -19,22 +19,26 @@ namespace Derevo.UI.Scripts
         private void Awake()
         {
             Slider.ChangeValueEvent += ValueChanged;
-            Slider.ResetSliderEvent += ResetSlider;
+            Slider.ResetSliderEvent += StopCurrentCoroutine;
         }
         private void ValueChanged(float value)
         {
+            if (UnfixedCellsManager.Target_ == null)
+                return;
+
             int countPTick = (int)value;
             if (countPTick > 0)
                 Increase(countPTick);
             else if (countPTick < 0)
                 Decrease(-countPTick);
             else
-                ResetSlider();
+                StopCurrentCoroutine();
         }
+
         private void Increase(int countPTick)
         {
-            if (CurrentCoroutine != null && !IsIncreasing)
-                StopCoroutine(CurrentCoroutine);
+            if (CurrentCoroutine != null && !IsIncreasing) 
+                InternalStopCurrentCoroutine();
             if (DiffusionParticlesManager.RemainedParticlesCount_ == 0)
                 return;
 
@@ -43,7 +47,7 @@ namespace Derevo.UI.Scripts
             if (CurrentCoroutine == null)
             {
                 CurrentCoroutine = StartCoroutine(Increasing());
-                    IsIncreasing = true;
+                IsIncreasing = true;
             }
         }
         private IEnumerator Increasing()
@@ -53,13 +57,13 @@ namespace Derevo.UI.Scripts
                 UnfixedCellsControl.IncreaseValue();
                 yield return new WaitForSeconds(MovingParticlesTimeDelay);
                 if (DiffusionParticlesManager.RemainedParticlesCount_ == 0)
-                    ResetSlider();
+                    InternalStopCurrentCoroutine();
             }
         }
         private void Decrease(int countPTick)
         {
             if (CurrentCoroutine != null && IsIncreasing)
-                StopCoroutine(CurrentCoroutine);
+                InternalStopCurrentCoroutine();
 
             MovingParticlesTimeDelay = GlobalConstsHandler.Instance_.ParticlesChanging_MinDelay / countPTick;
             if (CurrentCoroutine == null)
@@ -74,15 +78,22 @@ namespace Derevo.UI.Scripts
             {
                 UnfixedCellsControl.DecreaseValue();
                 yield return new WaitForSeconds(MovingParticlesTimeDelay);
-                if (UnfixedCellsManager.Target_==null)
-                    ResetSlider();
+                if (UnfixedCellsManager.Target_ == null)
+                    InternalStopCurrentCoroutine();
             }
         }
 
-        private void ResetSlider()
+        private void StopCurrentCoroutine()
         {
             if (CurrentCoroutine != null)
-                StopCoroutine(CurrentCoroutine);
+            {
+                InternalStopCurrentCoroutine();
+            }
+        }
+        private void InternalStopCurrentCoroutine()
+        {
+            StopCoroutine(CurrentCoroutine);
+            CurrentCoroutine = null;
         }
     }
 }

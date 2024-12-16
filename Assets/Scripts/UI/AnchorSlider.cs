@@ -8,7 +8,7 @@ using UnityEngine.EventSystems;
 
 namespace Derevo.UI
 {
-    public sealed class AnchorSlider : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
+    public sealed class AnchorSlider : MonoBehaviour, IPointerDownHandler
     {
         public event Action<float> ChangeValueEvent = delegate { };
         public event Action ResetSliderEvent = delegate { };
@@ -39,8 +39,16 @@ namespace Derevo.UI
         }
         private void Update()
         {
-            if(IsHolding_)
-                OnHold(Input.mousePosition); 
+            if (IsHolding_)
+            {
+                if (Input.GetMouseButtonUp(0))
+                {
+                    OnPointerUp();
+                    return;
+                }
+
+                OnHold(Input.mousePosition);
+            }
         }
 
         void IPointerDownHandler.OnPointerDown(PointerEventData eventData)
@@ -60,7 +68,7 @@ namespace Derevo.UI
                 ChangeValue(newValue, magnitude * HalfRectSize);
             }
         }
-        void IPointerUpHandler.OnPointerUp(PointerEventData eventData)
+        private void OnPointerUp()
         {
             ChangeValue(0, 0);
             IsHolding_ = false;
@@ -73,6 +81,11 @@ namespace Derevo.UI
                 IsVertical ? handlerPos : HandlerRect.localPosition.y,
                 HandlerRect.localPosition.z);
             ChangeValueEvent(Value_);
+        }
+
+        private void OnEnable()
+        {
+            OnPointerUp();
         }
     }
 }
