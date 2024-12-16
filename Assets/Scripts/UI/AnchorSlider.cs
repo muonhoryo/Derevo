@@ -2,13 +2,14 @@
 
 
 using System;
+using Derevo.PlayerControl;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace Derevo.UI
 {
-    public sealed class AnchorSlider : MonoBehaviour, IPointerDownHandler
+    public sealed class AnchorSlider : PlayerControlElement, IPointerDownHandler
     {
         public event Action<float> ChangeValueEvent = delegate { };
         public event Action ResetSliderEvent = delegate { };
@@ -23,17 +24,17 @@ namespace Derevo.UI
         public float Value_ { get; private set; }
         public bool IsHolding_ { get; private set; } = false;
 
-        private void Awake()
+        protected override void AwakeAction()
         {
-            Rect= transform as RectTransform;
+            Rect = transform as RectTransform;
             if (IsVertical)
             {
-                HalfRectSize = Rect.rect.height/2;
+                HalfRectSize = Rect.rect.height / 2;
                 HalfSize = HalfRectSize * transform.lossyScale.y;
             }
             else
             {
-                HalfRectSize = Rect.rect.width/2;
+                HalfRectSize = Rect.rect.width / 2;
                 HalfSize = HalfRectSize * transform.lossyScale.x;
             }
         }
@@ -86,6 +87,16 @@ namespace Derevo.UI
         private void OnEnable()
         {
             OnPointerUp();
+        }
+
+        protected override void LockAction()
+        {
+            enabled = false;
+            OnPointerUp();
+        }
+        protected override void UnlockAction()
+        {
+            enabled = true;
         }
     }
 }
