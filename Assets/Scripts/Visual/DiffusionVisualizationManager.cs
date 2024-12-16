@@ -44,6 +44,7 @@ namespace Derevo.Visual
         private void OnDestroy()
         {
             DiffusionProcessing.DiffusionProcessing.StartDiffusionEvent -= StartDiffusion;
+            LevelManager.ChangeCellValueEvent -= ChangeValueCell;
         }
         private void LevelLoadingDone()
         {

@@ -77,7 +77,7 @@ namespace Derevo.UI
 
         protected override void UnlockAction()
         {
-            IsActive_ = false;
+            IsActive_ = true;
         }
     }
 }

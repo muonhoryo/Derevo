@@ -200,6 +200,21 @@ namespace Derevo.Level
                 }
             }
         }
+        public static void UpdateUnfixedCells()
+        {
+            for(int i = 0; i < Width_; i++)
+            {
+                for (int j = 0; j < LevelMap[i].Length; j++)
+                {
+                    var parsCell = LevelMap[i][j] as ValuableCell;
+                    if (parsCell != null &&
+                        ((parsCell.DiffusionDirection_>0||parsCell.Value_>0)&&(parsCell.DiffusionDirection_&ValuableCell.DiffusionDirection.IsFixed)==0))
+                    {
+                        InternalTrySetDiffusionDirection(parsCell, ValuableCell.DiffusionDirection.IsFixed, i, j);
+                    }
+                }
+            }
+        }
         public static void SetCellType(LevelCell newCell,int column,int row)
         {
             if (!CheckCellPos(column, row))

@@ -14,6 +14,7 @@ namespace Derevo.UI.Scripts
 
         private bool IsIncreasing;
         private float MovingParticlesTimeDelay;
+        private int CountPerTick;
         private Coroutine CurrentCoroutine=null;
 
         private void Awake()
@@ -37,18 +38,32 @@ namespace Derevo.UI.Scripts
 
         private void Increase(int countPTick)
         {
-            if (CurrentCoroutine != null && !IsIncreasing) 
-                InternalStopCurrentCoroutine();
             if (DiffusionParticlesManager.RemainedParticlesCount_ == 0)
                 return;
 
-            MovingParticlesTimeDelay = GlobalConstsHandler.Instance_.ParticlesChanging_MinDelay / countPTick;
-            
-            if (CurrentCoroutine == null)
+            float newTimeDelay= GlobalConstsHandler.Instance_.ParticlesChanging_MinDelay / countPTick;
+
+            void StartIncCoroutine()
             {
+                MovingParticlesTimeDelay = newTimeDelay;
+                CountPerTick = countPTick;
                 CurrentCoroutine = StartCoroutine(Increasing());
                 IsIncreasing = true;
             }
+
+            if (CurrentCoroutine != null)
+            {
+                if (!IsIncreasing || CountPerTick != countPTick)
+                {
+                    InternalStopCurrentCoroutine();
+                    StartIncCoroutine();
+                }
+            }
+            else
+            {
+                StartIncCoroutine();
+            }
+
         }
         private IEnumerator Increasing()
         {
@@ -62,14 +77,26 @@ namespace Derevo.UI.Scripts
         }
         private void Decrease(int countPTick)
         {
-            if (CurrentCoroutine != null && IsIncreasing)
-                InternalStopCurrentCoroutine();
+            float newTimeDelay= GlobalConstsHandler.Instance_.ParticlesChanging_MinDelay / countPTick;
 
-            MovingParticlesTimeDelay = GlobalConstsHandler.Instance_.ParticlesChanging_MinDelay / countPTick;
-            if (CurrentCoroutine == null)
+            void StartDecCoroutine()
             {
+                MovingParticlesTimeDelay = newTimeDelay;
+                CountPerTick= countPTick;
                 CurrentCoroutine = StartCoroutine(Decreasing());
                 IsIncreasing = false;
+            }
+            if (CurrentCoroutine != null)
+            {
+                if (IsIncreasing || CountPerTick != countPTick)
+                {
+                    InternalStopCurrentCoroutine();
+                    StartDecCoroutine();
+                }
+            }
+            else
+            {
+                StartDecCoroutine();
             }
         }
         private IEnumerator Decreasing()

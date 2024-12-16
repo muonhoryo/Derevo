@@ -44,7 +44,8 @@ namespace Derevo.DiffusionProcessing
             LastStartedProcessInfo_.HandledProcceses = LevelManager.InitializeDiffusionProcesses();
             foreach (var proc in LastStartedProcessInfo_.HandledProcceses)
                 proc.Diffuse();
-            LevelManager.ResetValuableCellsDirections();
+            //LevelManager.ResetValuableCellsDirections();
+            LevelManager.UpdateUnfixedCells();
             LastStartedProcessInfo_.PostDiffMap = LevelManager.GetValueMap();
             StartDiffusionEvent();
             CoroutinesHandler.Instance_.StartCoroutine(EndDiffusionDelay());

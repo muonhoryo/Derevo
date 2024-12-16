@@ -113,7 +113,6 @@ namespace Derevo.UI
 
         protected override void LockAction()
         {
-            ChangeValueByIndex(0);
             OnPointerUp();
             enabled = false;
         }

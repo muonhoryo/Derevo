@@ -35,8 +35,7 @@ namespace Derevo.Level
                 cell==Target)
                 return;
             ValuableCell valCell = GetCellFromLevelManager(cell);
-            if (valCell==null||
-                (valCell.Value_ != 0 && valCell.DiffusionDirection_ == 0))
+            if (valCell==null|| !valCell.IsUnfixed_)
                 return;
 
             var info = new ReselectTargetEventInfo(Target, cell);
@@ -62,7 +61,8 @@ namespace Derevo.Level
         }
         public static bool TrySetDiffusionDirection(ValuableCell.DiffusionDirection direction)
         {
-            if (Target == null)
+            if (Target == null||
+                direction>=ValuableCell.DiffusionDirection.CannotHaveDirections)
                 return false;
             return LevelManager.TrySetCellDiffusionDirection(direction, Target.OwnerPos_.x, Target.OwnerPos_.y);
         }

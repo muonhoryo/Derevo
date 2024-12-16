@@ -61,7 +61,8 @@ namespace Derevo.UI
         }
         private bool AbleToHaveDiffDirection(ValuableCell.DiffusionDirection direction)
         {
-            return (direction & ValuableCell.DiffusionDirection.CannotHaveDirections) == 0;
+            return (direction&ValuableCell.DiffusionDirection.CannotHaveDirections)==0&&
+                (direction&ValuableCell.DiffusionDirection.IsFixed)==0;
         }
     }
 }

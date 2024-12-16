@@ -13,8 +13,10 @@ namespace Derevo.Level
             this.Value = Value;
             this.DiffDirection = DiffDirection;
         }
-        public const int MaxDiffusionDirectionDigitsCount = 6;
-        public const int MaxDiffusionDirectionValue = 64;
+        public const int MaxDiffusionDirectionDigitsCount = 7;
+        public const int MaxValuableDiffusionDigit = 5;
+        public const int MaxDiffusionDirectionValue = 255;
+        public const int MaxDiffusionValuableDirectionMask = 63;
         public const DiffusionDirection DefaultDirection = DiffusionDirection.Top;
         public enum DiffusionDirection : ushort
         {
@@ -24,7 +26,8 @@ namespace Derevo.Level
             BottomLeft=8,
             Bottom=16,
             BottomRight=32,
-            CannotHaveDirections=64
+            CannotHaveDirections=64,
+            IsFixed=128
         }
         protected Vector2Int GetPositionFromDirectionByDigit(int digit, Vector2Int cellPos)
         {
@@ -121,7 +124,7 @@ namespace Derevo.Level
                 TrySetDiffusionDirection(DiffusionDirection.CannotHaveDirections,cellPos.x, cellPos.y);
             }
         }
-        public bool IsUnfixed_ => Value == 0 || DiffDirection != 0;
+        public bool IsUnfixed_ => (DiffDirection & DiffusionDirection.IsFixed) == 0;
 
         protected Vector2Int[] GetCellsFromDirection(DiffusionDirection direction, Vector2Int cellPos)
         {
@@ -161,37 +164,24 @@ namespace Derevo.Level
             int parNewDir = (int)newDirection;
             if (parNewDir> MaxDiffusionDirectionValue)
                 return false;
-            if (newDirection != DiffusionDirection.CannotHaveDirections&&
-                newDirection!=0)
+            if (newDirection != 0 &&
+                newDirection <DiffusionDirection.CannotHaveDirections)
             {
                 Vector2Int cellPos = new Vector2Int(column, row);
                 Vector2Int connPos;
                 int mask = 1;
-                for (int i = 0; i < 8; i++)
+                for (int i = 0; i <=MaxValuableDiffusionDigit; i++)
                 {
                     if (TryGetPositionFromDirectionByDigit(newDirection, i, cellPos, out connPos)) //In direction mask this direction is written
                     {
-                        //if (i == 1)
-                        //{
-                        //    void PrintDigits(int value)
-                        //    {
-                        //        StringBuilder str = new StringBuilder(32);
-                        //        for(int i = 0; i < 32; i++)
-                        //        {
-                        //            str.Append((value & 1 << i) == 0 ? 0 : 1);
-                        //        }
-                        //        Debug.Log(str.ToString());
-                        //    }
-                        //}
-
                         if (!CheckCellConnection(connPos))
                             newDirection = (DiffusionDirection)((int)newDirection & ~(mask << i));
                     }
                 }
-                if (newDirection == 0) //Result haven't any options to set new direction so return false
-                {
-                    return false;
-                }
+            }
+            if((directionField&DiffusionDirection.CannotHaveDirections)!=0)
+            {
+                newDirection = newDirection | DiffusionDirection.CannotHaveDirections;
             }
             if (directionField != newDirection)
             {
