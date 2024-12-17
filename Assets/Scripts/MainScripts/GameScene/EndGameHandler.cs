@@ -14,6 +14,10 @@ namespace Derevo
         {
             DiffusionProcessing.DiffusionProcessing.EndDiffusionEvent += EndDiffusionAction;
         }
+        private void OnDestroy()
+        {
+            DiffusionProcessing.DiffusionProcessing.EndDiffusionEvent-= EndDiffusionAction;
+        }
         private void EndDiffusionAction()
         {
             if (DiffusionParticlesManager.RemainedParticlesCount_ == 0)

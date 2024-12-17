@@ -81,7 +81,7 @@ namespace Derevo.Visual
                     int targetDiff =  target_realValue- target_visualValue;
                     int currDiff = curr_visualValue - curr_realValue;
                     int movedParticles;
-                    if (targetDiff >= currDiff)
+                    if (targetDiff <= currDiff)
                     {
                         movedParticles = targetDiff;
                         lessCells.RemoveAt(lessCells.Count - 1);
@@ -94,6 +94,7 @@ namespace Derevo.Visual
                     ICellContainer diffusionTarget_visual;
                     diffusionTarget_visual = CellsVisualManager.GetCell(diffusionTarget.CellPosition.x, diffusionTarget.CellPosition.y).GetComponent<ICellContainer>();
                     float[] speeds = GetSpeeds(movedParticles);
+                    //Debug.Log("startmoving:\nOrigin: " + curr.CellPosition_ + "\nDestination: " + diffusionTarget.CellPosition + "\nCount: " + movedParticles);
                     DiffParticlesMovingManager.MoveCell2Cell(difProc, curr_visual, diffusionTarget_visual, speeds, movedParticles);
                     curr_visualValue -= movedParticles;
                 }
