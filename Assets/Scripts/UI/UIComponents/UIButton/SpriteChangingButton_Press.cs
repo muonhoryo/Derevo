@@ -18,6 +18,10 @@ namespace Derevo.UI
             TargetButton.OnPointerUpEvent += OnPointerUp;
             OnPointerUp();
         }
+        private void OnDisable()
+        {
+            OnPointerUp();
+        }
         private void OnPointerDown()
         {
             TargetSprite.sprite = PressedSprite;

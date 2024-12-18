@@ -19,6 +19,10 @@ namespace Derevo.UI
             TargetButton.DeactivationEvent += OnPointerExit;
             OnPointerExit();
         }
+        private void OnDisable()
+        {
+            OnPointerExit();
+        }
         private void OnPointerExit()
         {
             TargetGraphic.color = NormalColor;
