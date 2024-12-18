@@ -14,7 +14,7 @@ namespace Derevo
         public float LevelTransitionDelay;
         [Range(0,10)]
         public float ParticlesFermentationThreshold;
-        [Range(0,100)]
+        [Range(0.001f,100)]
         public float ParticlesFixingRadius;
         [Range(1,100)]
         public int RemParticlesVisualIndicator_FreeRowsCount;
@@ -38,6 +38,8 @@ namespace Derevo
         public float ParticleCellContainer_UploadXPosDispersion;
         [Range(0,10)]
         public float ParticlesContainers_StopHandlingTime;
+        [Range(0.001f, 100)]
+        public float ParticlesContainers_FixingCircleOverlapRadius;
         [Range(0.001f,10)]
         public float ParticlesChanging_MinDelay;
         public Vector2 CellsUploadPositionOffset;

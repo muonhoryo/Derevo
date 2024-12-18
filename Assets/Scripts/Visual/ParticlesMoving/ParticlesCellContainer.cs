@@ -36,7 +36,6 @@ namespace Derevo.Visual
                 PrevPos = Owner.transform.position;
                 if (step.magnitude <= GlobalConstsHandler.Instance_.ParticlesFermentationThreshold)
                 {
-                    IsActiveFermentation = false;
                     return true;
                 }
                 else
@@ -183,6 +182,15 @@ namespace Derevo.Visual
             bool isOdd = row % 2 == 0;
             column = Mathf.RoundToInt((isOdd ? parGlobalPos.x : parGlobalPos.x - particleRadius) / (particleRadius * 2));
             Vector2 parNewPos = new Vector2(isOdd?column * particleRadius * 2:column*particleRadius*2-particleRadius, row * CellsVisualManager.PhysicContainersRowHeight+RowsStart);
+
+            Collider2D coll = Physics2D.OverlapCircle(parNewPos, GlobalConstsHandler.Instance_.ParticlesContainers_FixingCircleOverlapRadius,
+                VisualPhysicHandler.Instance_.ParticlesOverlapMask);
+            if (coll != null)
+            {
+                parInfo.Owner.transform.position = UploadPosition_;
+                return;
+            }
+
             parInfo.Owner.transform.position = parNewPos;
             parInfo.Owner.TurnMovingOff();
             parInfo.IsActiveFermentation = false;

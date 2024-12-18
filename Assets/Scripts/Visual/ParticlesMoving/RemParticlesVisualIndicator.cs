@@ -118,8 +118,9 @@ namespace Derevo.Visual
             }
             FixedParticles = newFixedList;
         }
-        private void FixParticle(DiffusionParticle target)
+        private bool TryFixParticle(DiffusionParticle target)
         {
+
             FixedParticles.Add(target);
             int row = Mathf.RoundToInt((target.transform.position.y-BottomPosition) / CellsVisualManager.PhysicContainersRowHeight);
             float y = row * CellsVisualManager.PhysicContainersRowHeight+BottomPosition;
@@ -131,8 +132,18 @@ namespace Derevo.Visual
             x *= GlobalConstsHandler.Instance_.ParticlesFixingRadius * 2;
             if (isOdd)
                 x -= GlobalConstsHandler.Instance_.ParticlesFixingRadius;
-            target.transform.position = new Vector2(x, y);
+            Vector2 newPos = new Vector2(x, y);
+
+            if (Physics2D.OverlapCircle(newPos, GlobalConstsHandler.Instance_.ParticlesContainers_FixingCircleOverlapRadius,
+                VisualPhysicHandler.Instance_.ParticlesOverlapMask) != null)
+            {
+                target.transform.position = UploadPosition_;
+                return false;
+            }
+
+            target.transform.position = newPos;
             target.TurnMovingOff();
+            return true;
         }
         private void FreeParticle(DiffusionParticle target) 
         {
@@ -249,9 +260,11 @@ namespace Derevo.Visual
                     {
                         if (par.CheckStopping())
                         {
-                            FreeParticlesList.RemoveAt(i);
-                            FixParticle(par.Owner);
-                            i--;
+                            if (TryFixParticle(par.Owner))
+                            {
+                                FreeParticlesList.RemoveAt(i);
+                                i--;
+                            }
                         }
                         else
                             par.UpdatePrevPos();
